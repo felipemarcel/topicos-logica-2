@@ -1,0 +1,145 @@
+swagger: "2.0"
+info:
+  description: "API para consumo de informações relacionadas aos cidadãos, organizaçõese e serviços do governo do estado do Ceará"
+  version: "0.0.1"
+  title: "Acesso cidadão"
+  contact:
+    email: "felipe.marcel@insightlab.ufc.br"
+host: "18.212.0.161:9000"
+basePath: "/api"
+
+schemes:
+#- "https"
+- "http"
+paths:
+  /user-authorizer/citizen:
+    post:
+      tags:
+      - "Cidadão"
+      summary: "Criação de um novo cidadão"
+      description: ""
+      operationId: "registerCitizen"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Informações do cidadão para inserção na base do Acesso Cidadão"
+        required: true
+        schema:
+          $ref: "#/definitions/Citizen"
+      responses:
+        "201":
+          description: "Usuário criado com sucesso"
+        "409":
+          description: "Já existe um cadastro no sistema com esse identificador"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+        
+  /auth:
+    post:
+      tags:
+      - "Autenticação"
+      summary: "Requisição para obter um token do tipo Grant"
+      description: ""
+      operationId: "authentication"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "app-key"
+        in: "query"
+        description: "Atributo app-key obtido no momento de criação de uma aplicação. Serve para identificar uma aplicação."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        type: "string"
+        schema:
+          $ref: "#/definitions/UserCredentials"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/AuthBodyResponse"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+
+securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:pets: "modify pets in your account"
+      read:pets: "read your pets"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Citizen:
+    type: "object"
+    properties:
+      identifier:
+        type: "string"
+        description: "CPF do usuário"
+      email:
+        type: "string"
+        description: "Email do usuário"
+      name:
+        type: "string"
+        description: "Nome completo do usuário"
+  UserCredentials:
+    type: "object"
+    properties:
+      cpf:
+        type: "string"
+        description: "CPF do usuário"
+      password:
+        type: "string"
+        description: "Senha do usuário. Obs: Aplicar algoritmo sha256."
+  ClientInfo:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+        description: ""
+      name:
+        type: "string"
+        description: ""
+      email:
+        type: "string"
+        description: ""
+      organization:
+        type: "string"
+        description: ""
+
+  AuthBodyResponse:
+    type: "object"
+    properties:
+      client:
+          $ref: "#/definitions/ClientInfo"
+      token: 
+        type: "string"
+        description: "Token Jwt."
+      tokenType:
+        type: "string"
+          
+  ApiResponse:
+    type: "object"
+    properties:
+      status:
+        type: "integer"
+        format: "int32"
+      details:
+        type: "string"
+      message:
+        type: "string"
