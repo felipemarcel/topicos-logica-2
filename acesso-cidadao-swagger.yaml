@@ -1,145 +1,288 @@
-swagger: "2.0"
+openapi: 3.0.1
 info:
-  description: "API para consumo de informações relacionadas aos cidadãos, organizaçõese e serviços do governo do estado do Ceará"
-  version: "0.0.1"
-  title: "Acesso cidadão"
+  title: Acesso cidadão
+  description: API para consumo de informações relacionadas aos cidadãos, organizaçõese
+    e serviços do governo do estado do Ceará
   contact:
-    email: "felipe.marcel@insightlab.ufc.br"
-host: "18.212.0.161:9000"
-basePath: "/api"
-
-schemes:
-#- "https"
-- "http"
+    email: felipe.marcel@insightlab.ufc.br
+  version: 0.0.1
+servers:
+- url: http://18.212.0.161:9000/api
 paths:
-  /user-authorizer/citizen:
-    post:
-      tags:
-      - "Cidadão"
-      summary: "Criação de um novo cidadão"
-      description: ""
-      operationId: "registerCitizen"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Informações do cidadão para inserção na base do Acesso Cidadão"
-        required: true
-        schema:
-          $ref: "#/definitions/Citizen"
-      responses:
-        "201":
-          description: "Usuário criado com sucesso"
-        "409":
-          description: "Já existe um cadastro no sistema com esse identificador"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-        
+
   /auth:
     post:
       tags:
-      - "Autenticação"
-      summary: "Requisição para obter um token do tipo Grant"
-      description: ""
-      operationId: "authentication"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+      - Autenticação
+      summary: Requisição para obter um token de autenticação
+      operationId: authentication
       parameters:
-      - name: "app-key"
-        in: "query"
-        description: "Atributo app-key obtido no momento de criação de uma aplicação. Serve para identificar uma aplicação."
+      - name: app-key
+        in: query
+        description: Atributo app-key obtido no momento de criação de uma aplicação.
+          Serve para identificar uma aplicação.
         required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        type: "string"
         schema:
-          $ref: "#/definitions/UserCredentials"
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/UserCredentials'
+                - $ref: '#/components/schemas/AppCredentials'
+                - $ref: '#/components/schemas/DigitalCerticateCredentials'
+            examples:
+              user:
+                value:
+                  cpf: "11122233344"
+                  password: "cef14f3c248582f2cfa2b8152c4c2f919c27da88c7f0353d3a032aa3c8ba451b"
+              app:
+                value:
+                  appKey: "e70b335a916a6429f9964c5e29e69048"
+                  appServerKey: "80c93ebdf57d3836da3086d3d0a998ee"
+                  secret: "E5B9BEAE815BD6BD98434ABD46A4A"
+              digital-cert:
+                value:
+                  cpf: "11122233344"
+                  token: ""
+                  certificate: ""
+                  signature: ""
+            
+        required: false
       responses:
-        "200":
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/AuthBodyResponse"
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: Não foi possível fazer o login. Verifique se suas credenciais estão corretas e tente outra vez. 
+          
       security:
       - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-
-securityDefinitions:
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
-    flow: "implicit"
-    scopes:
-      write:pets: "modify pets in your account"
-      read:pets: "read your pets"
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
-definitions:
-  Citizen:
-    type: "object"
-    properties:
-      identifier:
-        type: "string"
-        description: "CPF do usuário"
-      email:
-        type: "string"
-        description: "Email do usuário"
-      name:
-        type: "string"
-        description: "Nome completo do usuário"
-  UserCredentials:
-    type: "object"
-    properties:
-      cpf:
-        type: "string"
-        description: "CPF do usuário"
-      password:
-        type: "string"
-        description: "Senha do usuário. Obs: Aplicar algoritmo sha256."
-  ClientInfo:
-    type: "object"
-    properties:
-      userId:
-        type: "string"
-        description: ""
-      name:
-        type: "string"
-        description: ""
-      email:
-        type: "string"
-        description: ""
-      organization:
-        type: "string"
-        description: ""
-
-  AuthBodyResponse:
-    type: "object"
-    properties:
-      client:
-          $ref: "#/definitions/ClientInfo"
-      token: 
-        type: "string"
-        description: "Token Jwt."
-      tokenType:
-        type: "string"
-          
-  ApiResponse:
-    type: "object"
-    properties:
-      status:
-        type: "integer"
-        format: "int32"
-      details:
-        type: "string"
-      message:
-        type: "string"
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/generate:
+    post:
+      tags:
+      - Autenticação
+      summary: Redirecionar usuário
+      operationId: redirect
+      parameters:
+      - name: app-key
+        in: query
+        description: Redireciona o usuário para o seviço correto segundo sua autenticação
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCredentials'
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: Não existe aplicação que válida com os dados informados.
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/me:
+    get:
+      tags:
+      - Autenticação
+      summary: Retorna informações daquele usuário
+      operationId: receiveCustomerInformation
+      parameters:
+      - in: header
+        name: Header
+        description: A requisição espera receber no cabeçalho os parâmetros Token e Accept-Client. O primeiro está relacionado ao token obtido na requisição /auth/generate e o segundo está relacionado ao id da da aplicação ou appServerKey.
+        required: true
+        schema:
+          $ref: '#/components/schemas/Me'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: O token não pertence a aplicação
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/digital-cert:
+    get:
+      tags:
+      - Autenticação
+      summary: Obtém um token de uso único por requisição para iniciar o fluxo de autenticação usando certificado digital
+      operationId: require
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  
+  /citizen:
+    post:
+      tags:
+      - Cadastro de cidadão
+      summary: Registrar cidadão
+      operationId: registerCitizen
+      parameters:
+      - name: app-key
+        in: query
+        description: Cadastro de cidadão na aplicação
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+               $ref: '#/components/schemas/CitizenRegistry'
+               required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: Cpf ou email já em uso, verifique os dados
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    UserCredentials:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: CPF do usuário
+        password:
+          type: string
+          description: 'Senha do usuário. Obs: Aplicar algoritmo sha256.'
+    AppCredentials:
+      type: object
+      properties:
+        appKey:
+          type: string
+        appServerKey:
+          type: string
+        secret:
+          type: string
+    DigitalCerticateCredentials:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: cpf do usuário
+        token:
+          type: string
+          description: tolken gerado pela aplicação
+        certificate:
+          type: string
+          description: ''
+        signature:
+          type: string
+          description: ''
+    SessionCredentials:
+      type: object
+      properties:
+        token:
+          type: string
+          description: token de acesso fornecido pela aplicação
+        appServerKey:
+          type: string
+          description: é a mesma chave fornecida pela aplicação
+    Me:
+      type: object
+      properties:
+        Authorization:
+          type: string
+          description: Token obtido no endpoint /auth/generate
+        Accept-Client:
+          type: string
+    CitizenRegistry:
+      type: object
+      properties:
+        email:
+          type: string
+          description: email do cidadão
+        identifier:
+          type: string
+          description: cpf do cidadão
+    ClientInfo:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Identificador do usuário ou da aplicação
+        name:
+          type: string
+          description: Nome do usuário ou da aplicação
+        email:
+          type: string
+          description: Email do usuário
+        organization:
+          type: string
+          description: Organização a qual o usuário pertence
+    AuthBodyResponse:
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/ClientInfo'
+        token:
+          type: string
+          description: Token Jwt.
+        tokenType:
+          type: string
+    ApiResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        details:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://petstore.swagger.io/oauth/dialog
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
