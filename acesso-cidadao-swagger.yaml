@@ -14,16 +14,9 @@ paths:
     post:
       tags:
       - Autenticação
-      summary: Requisição para obter um token de autenticação
+      summary: Autenticação de aplicação, pessoa física e jurídica através de identificador e senha ou através de certificado digital.
+      description: Esse endpoint faz parte de um fluxo de 2 requisições que devem ser feitas para que um usuário esteja autenticado e autorizado. Esta requisição é feita especificamente para obter informações básicas sobre o usuário e para obter um token do tipo `grant` que será trocado por um token do tipo `access`. Em outras palavras, esta requisição apenas autentica o usuário, portanto para o fluxo de autenticação e autorização, ela é a primeira requisição que deve ser feita. Obs - Esse endpoint pode receber 5 tipos de entidades em seu `body`  Usuários (cidadãos e servidores) com CPF e senha ou com certificado digital, Empresas com CNPJ e senha ou com certificado digital, e Aplicação com appKey, appServerKey e secret. Para autenticação e autorização de uma aplicação não é necessário seguir o fluxo completo, basta efetuar essa requisição e uma aplicação poderá consumir informações de qualquer outra aplicação.
       operationId: authentication
-      parameters:
-      - name: app-key
-        in: query
-        description: Atributo app-key obtido no momento de criação de uma aplicação.
-          Serve para identificar uma aplicação.
-        required: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
@@ -32,23 +25,34 @@ paths:
                 - $ref: '#/components/schemas/UserCredentials'
                 - $ref: '#/components/schemas/AppCredentials'
                 - $ref: '#/components/schemas/DigitalCerticateCredentials'
+                - $ref: '#/components/schemas/CompanyCredentials'
+                - $ref: '#/components/schemas/CompanyDigitalCertificateCredentials'
             examples:
-              user:
+              Usuário:
                 value:
                   cpf: "11122233344"
                   password: "cef14f3c248582f2cfa2b8152c4c2f919c27da88c7f0353d3a032aa3c8ba451b"
-              app:
+              Aplicação:
                 value:
                   appKey: "e70b335a916a6429f9964c5e29e69048"
                   appServerKey: "80c93ebdf57d3836da3086d3d0a998ee"
                   secret: "E5B9BEAE815BD6BD98434ABD46A4A"
-              digital-cert:
+              Certificado Digital CPF:
                 value:
                   cpf: "11122233344"
-                  token: ""
+                  token: "GcZRRtmguU2bg9F3SM9_LA"
                   certificate: ""
                   signature: ""
-            
+              CNPJ:
+                value:
+                  cnpj: "94163589000192"
+                  password: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
+              Certificado Digital CNPJ:
+                value:
+                  cpf: "94163589000192"
+                  token: "GcZRRtmguU2bg9F3SM9_LA"
+                  certificate: ""
+                  signature: ""
         required: false
       responses:
         200:
@@ -69,20 +73,17 @@ paths:
     post:
       tags:
       - Autenticação
-      summary: Redirecionar usuário
-      operationId: redirect
-      parameters:
-      - name: app-key
-        in: query
-        description: Redireciona o usuário para o seviço correto segundo sua autenticação
-        required: true
-        schema:
-          type: string
+      summary: Autorização de pessoa física e jurídica através de identificador e senha ou através de certificado digital.
+      description: Esse endpoint faz parte de um fluxo de 2 requisições que devem ser feitas para que um usuário esteja autenticado e autorizado. Esta requisição é feita especificamente para trocar o token do tipo `grant` por um token do tipo `access`. Em outras palavras, esta requisição autoriza o acesso de um usuário à uma aplicação.
+      operationId: authorization
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SessionCredentials'
+            example:
+              token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg4NjgxNzMsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.uzmkXqDsh4f4vKFjfQ33GvHYg1EitAkkaiMZi-VYO4c"
+              appServerKey: "80c93ebdf57d3836da3086d3d0a998ee"
         required: false
       responses:
         200:
@@ -102,7 +103,7 @@ paths:
     get:
       tags:
       - Autenticação
-      summary: Retorna informações daquele usuário
+      summary: Retorna informações do usuário corrente. O usuário corrente é identificado pelo token
       operationId: receiveCustomerInformation
       parameters:
       - in: header
@@ -111,6 +112,9 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
       responses:
         200:
           description: successful operation
@@ -137,7 +141,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthBodyResponse'
+                $ref: '#/components/schemas/DigitalCertResponse'
       security:
       - petstore_auth:
         - write:pets
@@ -147,22 +151,19 @@ paths:
   /citizen:
     post:
       tags:
-      - Cadastro de cidadão
+      - Cadastro
       summary: Registrar cidadão
       operationId: registerCitizen
-      parameters:
-      - name: app-key
-        in: query
-        description: Cadastro de cidadão na aplicação
-        required: true
-        schema:
-          type: string
       requestBody:
         content:
           application/json:
             schema:
-               $ref: '#/components/schemas/CitizenRegistry'
-               required: false
+              $ref: '#/components/schemas/CitizenRegistry'
+            example:
+              email: "uqs.dsilva@gmail.com"
+              identifier: "96914479089"
+              name: "Ulisses Silva"
+        required: false
       responses:
         200:
           description: successful operation
@@ -177,6 +178,38 @@ paths:
         - write:pets
         - read:pets
       x-codegen-request-body-name: body
+      
+  /company:
+    post:
+      tags:
+      - Cadastro
+      summary: Registrar empresa
+      operationId: registerCompany
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyRegistration'
+            example:
+              companyName: "empresa"
+              cnpj: "96914479089"
+              password: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: Cnpj já em uso, verifique os dados
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+      
 components:
   schemas:
     UserCredentials:
@@ -212,6 +245,30 @@ components:
         signature:
           type: string
           description: ''
+    CompanyCredentials:
+      type: object
+      properties:
+        cnpj:
+          type: string
+          description: cnpj da empresa
+        password:
+          type: string
+          description: "Senha do usuário. Obs: Aplicar algoritmo sha256"
+    CompanyDigitalCertificateCredentials:
+      type: object
+      properties:
+        cnpj:
+          type: string
+          description: cnpj da empresa
+        token:
+          type: string
+          description: tolken gerado pela aplicação
+        certificate:
+          type: string
+          description: ''
+        signature:
+          type: string
+          description: ''
     SessionCredentials:
       type: object
       properties:
@@ -238,6 +295,21 @@ components:
         identifier:
           type: string
           description: cpf do cidadão
+        name:
+          type: string
+          description: Nome do cidadão
+    CompanyRegistration:
+      type: object
+      properties:
+        companyName:
+          type: string
+          description: razão soxial da empresa
+        cnpj:
+          type: string
+          description: "Senha do usuário. Obs: Aplicar algoritmo sha256"
+        password:
+          type: string
+          description: Nome do cidadão
     ClientInfo:
       type: object
       properties:
@@ -273,6 +345,13 @@ components:
           type: string
         message:
           type: string
+          
+    DigitalCertResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          
   securitySchemes:
     petstore_auth:
       type: oauth2
