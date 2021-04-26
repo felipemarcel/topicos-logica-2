@@ -49,7 +49,7 @@ paths:
                   password: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
               Certificado Digital CNPJ:
                 value:
-                  cpf: "94163589000192"
+                  cnpj: "94163589000192"
                   token: "GcZRRtmguU2bg9F3SM9_LA"
                   certificate: ""
                   signature: ""
@@ -62,13 +62,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthBodyResponse'
         400:
-          description: Não foi possível fazer o login. Verifique se suas credenciais estão corretas e tente outra vez. 
+          description: Codigos de erros ao autenticar cidadão
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                credenciasInvalidas:
+                  value:
+                    status: 400
+                    details: Dados de autenticação enviados são invalidos
+                    message: Erro ao autenticar acesso do usuário
+                    code: 1
+                identificadorInvalido:
+                  value:
+                    status: 400
+                    details: Identificador informado está incorreto
+                    message: Erro ao autenticar acesso do usuário
+                    code: 2
+                naoAutorizado:
+                  value:
+                    status: 400
+                    details: Dados de autenticação enviados são invalidos
+                    message: Erro ao autenticar acesso do usuário
+                    code: 3
           
       security:
       - petstore_auth:
         - write:pets
         - read:pets
       x-codegen-request-body-name: body
+  /auth/2fa/validate:
+    post:
+      tags:
+      - Autenticação
+      summary: Autorização de pessoa física 2fa
   /auth/generate:
     post:
       tags:
@@ -172,7 +200,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthBodyResponse'
         400:
-          description: Cpf ou email já em uso, verifique os dados
+          description: Codigos de erros ao cadastrar cidadão
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                emailInvalido:
+                  value:
+                    status: 400
+                    details: Email informado não é válido
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 1
+                cpfINvalido:
+                  value:
+                    status: 400
+                    details: CPF informado não é válido, verifique os dados
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 2
+                usuarioJaExistente:
+                  value:
+                    status: 400
+                    details: usuário já está em uso
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 3
       security:
       - petstore_auth:
         - write:pets
@@ -191,9 +242,30 @@ paths:
             schema:
               $ref: '#/components/schemas/CompanyRegistration'
             example:
-              companyName: "empresa"
+              cpf: "05485320520"
               cnpj: "96914479089"
-              password: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
+              senha: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
+              email: "mycompanymail@email.com"
+              endereco: 
+                logradouro: "Rua Tal"
+                numLogradouro: "123"
+                bairro: "Serrinha"
+                cep: "60742755"
+                nomeMunicipio: "Fortaleza"
+                nomeEstado: "Ceara"
+              telefones:
+                [{
+                  ddd: "85",
+                  numero: "988889999",
+                  celular: true,
+                  autorizador: true
+                },
+                {
+                  ddd: "85",
+                  numero: "988889999",
+                  celular: true,
+                  autorizador: true
+                }]
         required: false
       responses:
         200:
@@ -203,7 +275,66 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthBodyResponse'
         400:
-          description: Cnpj já em uso, verifique os dados
+          description: Codigos de erros ao cadastrar empresa
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Telefone não informado:
+                  value:
+                    status: 400
+                    details: Telefone não informado, é necessário informar pelo menos um telefone válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 1
+                Telefone inválido:
+                  value:
+                    status: 400
+                    details: Telefone com formato inválido. Formatos esperados - ddd 123456789 ou ddd 12345678
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 2
+                Cnpj não encontrado:
+                  value:
+                    status: 400
+                    details: Não foi possível encontrar o CNPJ informado
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 3
+                Representante não disponivel:
+                  value:
+                    status: 400
+                    details: CPF do representante não disponível.
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 4
+                Cpf do representante não encontrado:
+                  value:
+                    status: 400
+                    details: O CPF do representante informado difere do CPF do representante desse CNPJ!
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 5
+                Cnpj repetido:
+                  value:
+                    status: 400
+                    details: CNPJ já em uso, insiira um novo cnpj válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 6
+                Representante não cadastrado:
+                  value:
+                    status: 400
+                    details: CPF do representante não cadastrado
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 7
+                Telefone autorizador não informado:
+                  value:
+                    status: 400
+                    details: Deve ser enviado exatamente um numero celular que seja autorizador
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 8
+                Email inválido:
+                  value:
+                    status: 400
+                    details: Email informado não é válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 9
       security:
       - petstore_auth:
         - write:pets
@@ -301,15 +432,60 @@ components:
     CompanyRegistration:
       type: object
       properties:
-        companyName:
+        cpf:
           type: string
-          description: razão soxial da empresa
+          description: cpf do representante
         cnpj:
           type: string
           description: "Senha do usuário. Obs: Aplicar algoritmo sha256"
-        password:
+        senha:
           type: string
-          description: Nome do cidadão
+          description: Senha a ser cadastrada
+        email:
+          type: string
+          description: email da empresa a ser cadastrado
+        endereco:
+          type: object
+          properties:
+            logradouro:
+              type: string
+            numLogradouro:
+              type: string
+            bairro:
+              type: string
+            cep:
+              type: string
+            nomeMunicipio:
+              type: string
+            uf:
+              type: string
+        telefones:
+          type: array
+          items:
+            type: object
+            properties:
+              option1:
+                type: object
+                properties:
+                  ddd:
+                    type: string
+                  numero:
+                    type: string
+                  celular:
+                    type: boolean
+                  autorizador:
+                    type: boolean
+              option2:
+                  type: object
+                  properties:
+                    ddd:
+                      type: string
+                    numero:
+                      type: string
+                    celular:
+                      type: boolean
+                    autorizador:
+                      type: boolean
     ClientInfo:
       type: object
       properties:
@@ -335,7 +511,7 @@ components:
           description: Token Jwt.
         tokenType:
           type: string
-    ApiResponse:
+    ApiErrorResponse:
       type: object
       properties:
         status:
@@ -345,7 +521,9 @@ components:
           type: string
         message:
           type: string
-          
+        errorCode:
+          type: integer
+          format: int32
     DigitalCertResponse:
       type: object
       properties:
