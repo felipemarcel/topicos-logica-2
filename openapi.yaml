@@ -256,7 +256,7 @@ paths:
       parameters:
       - in: header
         name: Header
-        description: A requisição espera receber no cabeçalho os parâmetros Token e Accept-Client. O primeiro está relacionado ao token obtido na requisição /auth/generate e o segundo está relacionado ao id da da aplicação ou appServerKey.
+        description: A requisição espera receber no cabeçalho os parâmetros Token e Accept-Client. O primeiro está relacionado ao token obtido na requisição /auth/generate e o segundo está relacionado ao id da aplicação ou appServerKey.
         required: true
         schema:
           $ref: '#/components/schemas/Me'
@@ -314,7 +314,7 @@ paths:
                 Token de acesso esperado:
                   value:
                     status: 400
-                    details: Só tokens de acesso podem ser validados para uma aplicação
+                    details: Para obter os dados do usuário na aplicação desejada, o token enviado deve ser do tipo ACCESS
                     message: Só tokens de acesso podem ser validados para uma aplicação
                     errorcode: 34
       security:
@@ -363,9 +363,25 @@ paths:
             schema:
               $ref: '#/components/schemas/CitizenRegistry'
             example:
-              email: "uqs.dsilva@gmail.com"
-              identifier: "96914479089"
-              name: "Ulisses Silva"
+              identifier: 05485320520
+              email: email@email.com
+              name: Dono Company
+              password: ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c
+              address:
+                zipCode: '61942345'
+                address: Rua X
+                addressNumber: '79'
+                district: Aldeota
+                addressCityName: Fortaleza
+                addressStateName: Ceará
+                addressComplement: Complemento ...
+              phones:
+                - ddd: '85'
+                  number: '85999998888'
+                  phoneTypeId: 1
+                  authorize: true
+              
+              
         required: false
       responses:
         200:
@@ -395,10 +411,40 @@ paths:
                     code: 2
                 Usuário existente:
                   value:
-                    status: 400
+                    status: 409
                     details: Usuário já está em uso
                     message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
                     code: 3
+                Telefone Obrigatório:
+                  value:
+                    status: 400
+                    details: Deve ser enviado pelo menos algum telefone
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 4
+                Telefone Inválido:
+                  value:
+                    status: 400
+                    details: Um dos telefones enviados está com o formato incorreto
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 5
+                Telefone Celular com Autorização:
+                  value:
+                    status: 400
+                    details: Deve existir exatamente um telefone celular enviado que é autorizador
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 6
+                Email Já Cadastrado:
+                  value:
+                    status: 400
+                    details: O email enviado já está sendo utilizado no sistema!
+                    message: O email enviado já está sendo utilizado no sistema!
+                    code: 7
+                Tipo Do Telefone Inválido:
+                  value:
+                    status: 400
+                    details: Tipo de telefone enviado não é válido
+                    message: O tipo de telefone informado não é válido. Formatos válidos são 1 para telefone fixo, 2 para celular e 3 para corporativo.
+                    code: 8
       security:
       - petstore_auth:
         - write:pets
@@ -510,6 +556,12 @@ paths:
                     details: Email informado não é válido
                     message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
                     code: 9
+                Email Já Em Uso:
+                  value:
+                    status: 400
+                    details: O email enviado já está sendo utilizado no sistema!
+                    message: O email enviado já está sendo utilizado no sistema!
+                    code: 10
       security:
       - petstore_auth:
         - write:pets
@@ -628,15 +680,55 @@ components:
     CitizenRegistry:
       type: object
       properties:
-        email:
-          type: string
-          description: email do cidadão
         identifier:
           type: string
-          description: cpf do cidadão
+        email:
+          type: string
         name:
           type: string
-          description: Nome do cidadão
+        password:
+          type: string
+        address:
+          type: object
+          properties:
+            zipCode:
+              type: string
+              description: CEP a ser informado
+            address:
+              type: string
+              description: Rua a ser informada
+            addressNumber:
+              type: string
+              description: Número da residência
+            district:
+              type: string
+              description: Bairro a ser informado
+            addressCityName:
+              type: string
+              description: Nome da cidade
+            addressStateName:
+              type: string
+              description: Nome do Estado
+            addressComplement:
+              type: string
+              description: Complementa do endereço
+        telefones:
+          type: array
+          items:
+            type: object
+            properties:
+              option1:
+                type: object
+                properties:
+                  ddd:
+                    type: string
+                  numero:
+                    type: string
+                  phoneTypeId:
+                    type: integer
+                    format: int32
+                  authorize:
+                    type: boolean
     CompanyRegistration:
       type: object
       properties:
