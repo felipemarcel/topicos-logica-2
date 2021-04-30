@@ -1,0 +1,932 @@
+openapi: 3.0.1
+info:
+  title: Acesso cidadão
+  description: API para consumo de informações relacionadas aos cidadãos, organizaçõese
+    e serviços do governo do estado do Ceará
+  contact:
+    email: felipe.marcel@insightlab.ufc.br
+  version: 0.0.1
+servers:
+- url: http://18.212.0.161:9000/api
+paths:
+
+  /auth:
+    post:
+      tags:
+      - Autenticação
+      summary: Autenticação de aplicação, pessoa física e jurídica através de identificador e senha ou através de certificado digital.
+      description: Esse endpoint faz parte de um fluxo de 2 requisições que devem ser feitas para que um usuário esteja autenticado e autorizado. Esta requisição é feita especificamente para obter informações básicas sobre o usuário e para obter um token do tipo `grant` que será trocado por um token do tipo `access`. Em outras palavras, esta requisição apenas autentica o usuário, portanto para o fluxo de autenticação e autorização, ela é a primeira requisição que deve ser feita. Obs - Esse endpoint pode receber 5 tipos de entidades em seu `body`  Usuários (cidadãos e servidores) com CPF e senha ou com certificado digital, Empresas com CNPJ e senha ou com certificado digital, e Aplicação com appKey, appServerKey e secret. Para autenticação e autorização de uma aplicação não é necessário seguir o fluxo completo, basta efetuar essa requisição e uma aplicação poderá consumir informações de qualquer outra aplicação.
+      operationId: authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/UserCredentials'
+                - $ref: '#/components/schemas/AppCredentials'
+                - $ref: '#/components/schemas/DigitalCerticateCredentials'
+                - $ref: '#/components/schemas/CompanyCredentials'
+                - $ref: '#/components/schemas/CompanyDigitalCertificateCredentials'
+            examples:
+              Usuário:
+                value:
+                  cpf: "11122233344"
+                  password: "cef14f3c248582f2cfa2b8152c4c2f919c27da88c7f0353d3a032aa3c8ba451b"
+              Aplicação:
+                value:
+                  appKey: "e70b335a916a6429f9964c5e29e69048"
+                  appServerKey: "80c93ebdf57d3836da3086d3d0a998ee"
+                  secret: "E5B9BEAE815BD6BD98434ABD46A4A"
+              Certificado Digital CPF:
+                value:
+                  cpf: "11122233344"
+                  token: "GcZRRtmguU2bg9F3SM9_LA"
+                  certificate: ""
+                  signature: ""
+              CNPJ:
+                value:
+                  cnpj: "94163589000192"
+                  password: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
+              Certificado Digital CNPJ:
+                value:
+                  cnpj: "94163589000192"
+                  token: "GcZRRtmguU2bg9F3SM9_LA"
+                  certificate: ""
+                  signature: ""
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ClientInfoSuccessResponse'
+                  - $ref: '#/components/schemas/AppCredentilasSuccessResponse'
+              examples:
+                ClientInfoSuccessResponse:
+                  value:
+                    client:
+                      userId: 05750019330
+                      name: ULISSES QUEIROZ DA SILVA
+                      email: ulisses.queiroz@insightlab.ufc.br
+                      organization: Cidadão Brasileiro
+                      userAccountInfo:
+                        deprecatedDetails: false
+                        deprecatedPassword: false
+                        lastPasswordUpdate: '2021-03-29T12:06:44-03:00'
+                        passwordExpirationDate: '2313-07-09T11:54:01-03:00'
+                        has2FA: false
+                        twoFactorRequired: true
+                    token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o
+                    tokenType: grant
+                    roles: []
+                AppCredentilasSuccessResponse:
+                  value:
+                    client:
+                      title: PORTAL
+                      appKey: e70b335a916a6429f9964c5e29e69048
+                      acronym: PORTAL
+                      id: 11
+                    token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDQzNTksImlkZW50aWZpZXIiOiJlNzBiMzM1YTkxNmE2NDI5Zjk5NjRjNWUyOWU2OTA0OCIsInRva2VuVHlwZSI6ImFjY2VzcyIsInRva2VuTnVtYmVyIjoxLCJjbGllbnRUeXBlIjoiYXBwbGljYXRpb24iLCJhcHBTZXJ2ZXJLZXkiOiI4MGM5M2ViZGY1N2QzODM2ZGEzMDg2ZDNkMGE5OThlZSJ9.OgZshD6KcsxPGcauF49ZT84w3YQU2kHjOgMgZohBwEw
+                    tokenType: access
+                    roles:
+                      - role: ROLE_SEGURANCA_GER_ATUALIZAR
+                      - role: ROLE_SEGURANCA_GER_BUSCAR
+                      - role: ROLE_SEGURANCA_USU
+                      - role: ROLE_SEGURANCA_CID
+                      - role: ROLE_SEGURANCA_ADM
+                      - role: ROLE_SEGURANCA_GER_ADICIONAR
+        400:
+          description: Codigos de erros ao autenticar cidadão
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Credencias inválidas:
+                  value:
+                    status: 400
+                    details: Cliente não possui permissões para acessar o sistema.
+                    message: Cliente não possui permissões para acessar o sistema
+                    code: 1
+                Identificador inválido:
+                  value:
+                    status: 400
+                    details: Identificador informado está incorreto
+                    message: Erro ao autenticar acesso do usuário
+                    code: 2
+                Não autorizado:
+                  value:
+                    status: 400
+                    details: Dados de autenticação enviados são invalidos
+                    message: Erro ao autenticar acesso do usuário
+                    code: 3
+          
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/2fa/validate:
+    post:
+      tags:
+      - Autenticação
+      summary: Autorização de pessoa física 2fa
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/2faValidate'
+            example:
+              code: '860159'
+      responses:
+        200:
+          description: sucess
+        400:
+          description: Codigo de erro ao não encontrar telefone autorizado
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Credencias inválidas:
+                  value:
+                    status: 400
+                    details: Não foi possível encontrar nenhum telefone autorizador cadastrado.
+                    message: Verifique se o telefone está cadastrado corretamente
+                    code: 70
+                Cliente Desabilitado:
+                  value:
+                    status: 400
+                    details: Cliente Desabilitado
+                    message: Cliente Desabilitado
+                    code: 2
+                Código Inválido:
+                  value:
+                    status: 400
+                    details: O código informado não corresponde ao código enviado.
+                    message: Código de validação da autenticação em 2 etapas inválido.
+                    code: 72
+                Tempo Expirado:
+                  value:
+                    status: 400
+                    details: Tempo para verificação expirado
+                    message: O tempo para realizar a autenticação em 2 etapas expirou. Por favor, efetue novamente o login
+                    code: 74
+        500:
+          description: Autenticação em duas etapas desabilitada
+          content:
+            ApiErrorResponseServer:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                status: 500
+                message: A autenticação em 2 etapas não está habilitada
+                errorCode: 71
+  /auth/generate:
+    post:
+      tags:
+      - Autenticação
+      summary: Autorização de pessoa física e jurídica através de identificador e senha ou através de certificado digital.
+      description: Esse endpoint faz parte de um fluxo de 2 requisições que devem ser feitas para que um usuário esteja autenticado e autorizado. Esta requisição é feita especificamente para trocar o token do tipo `grant` por um token do tipo `access`. Em outras palavras, esta requisição autoriza o acesso de um usuário à uma aplicação.
+      operationId: authorization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCredentials'
+            example:
+              token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg4NjgxNzMsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.uzmkXqDsh4f4vKFjfQ33GvHYg1EitAkkaiMZi-VYO4c"
+              appServerKey: "80c93ebdf57d3836da3086d3d0a998ee"
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCredentialsSuccessResponse'
+              example:
+                token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg4NjgzMDgsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImFjY2VzcyIsInRva2VuTnVtYmVyIjoxLCJjbGllbnRUeXBlIjoidXNlciIsImFwcFNlcnZlcktleSI6IjgwYzkzZWJkZjU3ZDM4MzZkYTMwODZkM2QwYTk5OGVlIn0.9nw6HYdwdQOvAnZddsKn-WrinLlcTPKG2X3OLQknRjQ
+                redirect: 'http://50.17.69.232:3000/home'
+                
+        400:
+          description: Erro apresentado quando um usuário ou aplicação estão desabilitados, ou usuário não tem permissões
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Apicação desabilitada:
+                  value:
+                    status: 400
+                    details: Não é possivel efetuar o login. A aplicação esta desabilitada no sistema
+                    message: Não é possivel efetuar o login. A aplicação esta desabilitada no sistema
+                    errorcode: 1
+                Cliente desabilitado:
+                  value:
+                    status: 400
+                    details: Cliente desabilitado
+                    message: Cliente desabilitado
+                    errorcode: 2
+                Token inválido:
+                  value:
+                    status: 400
+                    details: Token inválido ou invalidado
+                    message: O token enviado não está de acordo com o token gerado pelo sistema!
+                    errorcode: 30
+                Usuário sem permissões:
+                  value:
+                    status: 400
+                    details: Usuário sem permissões para acessar aplicação
+                    message: O usuário não possui permissões suficientes para acessar a aplicação
+                    errorcode: 31
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/me:
+    get:
+      tags:
+      - Autenticação
+      summary: Retorna informações do usuário corrente. O usuário corrente é identificado pelo token
+      operationId: receiveCustomerInformation
+      parameters:
+      - in: header
+        name: Header
+        description: A requisição espera receber no cabeçalho os parâmetros Token e Accept-Client. O primeiro está relacionado ao token obtido na requisição /auth/generate e o segundo está relacionado ao id da aplicação ou appServerKey.
+        required: true
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthMeSuccessResponse'
+              example:
+                client:
+                  userId: 05750019330
+                  name: ULISSES QUEIROZ DA SILVA
+                  email: ulisses.queiroz@insightlab.ufc.br
+                  organization: Cidadão Brasileiro
+                  userAccountInfo:
+                    deprecatedDetails: false
+                    deprecatedPassword: false
+                    lastPasswordUpdate: '2021-03-29T12:06:44-03:00'
+                    passwordExpirationDate: '2313-07-09T11:54:01-03:00'
+                    has2FA: false
+                    twoFactorRequired: true
+                tokenType: grant
+                roles: []
+                
+        400:
+          description: Erro ao solicitar dados do usuário
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Token inválido:
+                  value:
+                    status: 400
+                    details: Token enviado é inválido ou foi invalidado
+                    message: Problema no token informado para obter informações do usuário
+                    errorcode: 30
+                Token não é do tipo 'Access':
+                  value:
+                    status: 400
+                    details: Token enviado é de grant mas espera-se um token de access
+                    message: Não é possível realizar autenticação com o grant
+                    errorcode: 32
+                Token de outra aplicação:
+                  value:
+                    status: 400
+                    details: Token enviado pertence a outra aplicação
+                    message: O token não pertence a aplicação
+                    errorcode: 33
+                Token de acesso esperado:
+                  value:
+                    status: 400
+                    details: Para obter os dados do usuário na aplicação desejada, o token enviado deve ser do tipo ACCESS
+                    message: Só tokens de acesso podem ser validados para uma aplicação
+                    errorcode: 34
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/digital-cert:
+    get:
+      tags:
+      - Autenticação
+      summary: Obtém um token de uso único por requisição para iniciar o fluxo de autenticação usando certificado digital
+      operationId: require
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DigitalCertResponse'
+        500:
+          description: Erro ao solicitar dados do usuário
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                  status: 500
+                  details: Erro ao iniciar fluxo de autenticação por certificado digital. Por favor, tente novamente mais tarde
+                  message: Erro ao iniciar fluxo de autenticação por certificado digital
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  
+  /citizen:
+    post:
+      tags:
+      - Cadastro
+      summary: Registrar cidadão
+      operationId: registerCitizen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CitizenRegistry'
+            example:
+              identifier: 05485320520
+              email: email@email.com
+              name: Dono Company
+              password: ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c
+              address:
+                zipCode: '61942345'
+                address: Rua X
+                addressNumber: '79'
+                district: Aldeota
+                addressCityName: Fortaleza
+                addressStateName: Ceará
+                addressComplement: Complemento ...
+              phones:
+                - ddd: '85'
+                  number: '999998888'
+                  phoneTypeId: 1
+                  authorize: true
+              
+              
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: Codigos de erros ao cadastrar cidadão
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Email inválido:
+                  value:
+                    status: 400
+                    details: Email informado não é válido
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 1
+                Cpf inválido:
+                  value:
+                    status: 400
+                    details: CPF informado não é válido, verifique os dados
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 2
+                Usuário existente:
+                  value:
+                    status: 409
+                    details: Usuário já está em uso
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 3
+                Telefone Obrigatório:
+                  value:
+                    status: 400
+                    details: Deve ser enviado pelo menos algum telefone
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 4
+                Telefone Inválido:
+                  value:
+                    status: 400
+                    details: Um dos telefones enviados está com o formato incorreto
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 5
+                Telefone Celular com Autorização:
+                  value:
+                    status: 400
+                    details: Deve existir exatamente um telefone celular enviado que é autorizador
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 6
+                Email Já Cadastrado:
+                  value:
+                    status: 400
+                    details: O email enviado já está sendo utilizado no sistema!
+                    message: O email enviado já está sendo utilizado no sistema!
+                    code: 7
+                Tipo Do Telefone Inválido:
+                  value:
+                    status: 400
+                    details: Tipo de telefone enviado não é válido
+                    message: O tipo de telefone informado não é válido. Formatos válidos são 1 para telefone fixo, 2 para celular e 3 para corporativo.
+                    code: 8
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+      
+  /company:
+    post:
+      tags:
+      - Cadastro
+      summary: Registrar empresa
+      operationId: registerCompany
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyRegistration'
+            example:
+              cpf: "05485320520"
+              cnpj: "96914479089"
+              senha: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
+              email: "mycompanymail@email.com"
+              endereco: 
+                logradouro: "Rua Tal"
+                numLogradouro: "123"
+                bairro: "Serrinha"
+                cep: "60742755"
+                nomeMunicipio: "Fortaleza"
+                nomeEstado: "Ceara"
+              telefones:
+                [{
+                  ddd: "85",
+                  numero: "988889999",
+                  celular: true,
+                  autorizador: true
+                },
+                {
+                  ddd: "85",
+                  numero: "988889999",
+                  celular: true,
+                  autorizador: true
+                }]
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: Codigos de erros ao cadastrar empresa
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Telefone não informado:
+                  value:
+                    status: 400
+                    details: Telefone não informado, é necessário informar pelo menos um telefone válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 1
+                Telefone inválido:
+                  value:
+                    status: 400
+                    details: Telefone com formato inválido. Formatos esperados - ddd 123456789 ou ddd 12345678
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 2
+                Cnpj não encontrado:
+                  value:
+                    status: 400
+                    details: Não foi possível encontrar o CNPJ informado
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 3
+                Representante não disponivel:
+                  value:
+                    status: 400
+                    details: CPF do representante não disponível.
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 4
+                Cpf do representante não encontrado:
+                  value:
+                    status: 400
+                    details: O CPF do representante informado difere do CPF do representante desse CNPJ!
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 5
+                Cnpj repetido:
+                  value:
+                    status: 400
+                    details: CNPJ já em uso, insiira um novo cnpj válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 6
+                Representante não cadastrado:
+                  value:
+                    status: 400
+                    details: CPF do representante não cadastrado
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 7
+                Telefone autorizador não informado:
+                  value:
+                    status: 400
+                    details: Deve ser enviado exatamente um numero celular que seja autorizador
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 8
+                Email inválido:
+                  value:
+                    status: 400
+                    details: Email informado não é válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 9
+                Email Já Em Uso:
+                  value:
+                    status: 400
+                    details: O email enviado já está sendo utilizado no sistema!
+                    message: O email enviado já está sendo utilizado no sistema!
+                    code: 10
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /users/recovery/{userEmail}:
+    get:
+      tags:
+      - Recuperação de Senha
+      summary: Solicitar recuperação de senha via email
+      operationId: Recovry
+      parameters:
+      - in: path
+        name: userEmail
+        description: Envio de emial para recuperar a senha
+        schema:
+          type: object
+        required: true
+      responses:
+        200:
+          description: Instruções para recuperação de senha foram enviado para email informado
+          content:
+            application/json:
+              example:
+                status: 200
+                details: Instruções enviadas para email informado
+                message: Instruções enviadas para email informado
+        400:
+          description: Erro ao tentar recuperar senha
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                status: 400
+                details: Email informado não é válido 
+                message: Email informado não é válido
+components:
+  schemas:
+    2faValidate:
+      type: object
+    UserCredentials:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: CPF do usuário
+        password:
+          type: string
+          description: 'Senha do usuário. Obs: Aplicar algoritmo sha256.'
+    AppCredentials:
+      type: object
+      properties:
+        appKey:
+          type: string
+        appServerKey:
+          type: string
+        secret:
+          type: string
+    DigitalCerticateCredentials:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: cpf do usuário
+        token:
+          type: string
+          description: tolken gerado pela aplicação
+        certificate:
+          type: string
+          description: ''
+        signature:
+          type: string
+          description: ''
+    CompanyCredentials:
+      type: object
+      properties:
+        cnpj:
+          type: string
+          description: cnpj da empresa
+        password:
+          type: string
+          description: "Senha do usuário. Obs: Aplicar algoritmo sha256"
+    CompanyDigitalCertificateCredentials:
+      type: object
+      properties:
+        cnpj:
+          type: string
+          description: cnpj da empresa
+        token:
+          type: string
+          description: tolken gerado pela aplicação
+        certificate:
+          type: string
+          description: ''
+        signature:
+          type: string
+          description: ''
+    SessionCredentials:
+      type: object
+      properties:
+        token:
+          type: string
+          description: token de acesso fornecido pela aplicação
+        appServerKey:
+          type: string
+          description: é a mesma chave fornecida pela aplicação
+    Me:
+      type: object
+      properties:
+        Authorization:
+          type: string
+          description: Token obtido no endpoint /auth/generate
+        Accept-Client:
+          type: string
+    CitizenRegistry:
+      type: object
+      properties:
+        identifier:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        address:
+          type: object
+          properties:
+            zipCode:
+              type: string
+              description: CEP a ser informado
+            address:
+              type: string
+              description: Rua a ser informada
+            addressNumber:
+              type: string
+              description: Número da residência
+            district:
+              type: string
+              description: Bairro a ser informado
+            addressCityName:
+              type: string
+              description: Nome da cidade
+            addressStateName:
+              type: string
+              description: Nome do Estado
+            addressComplement:
+              type: string
+              description: Complementa do endereço
+        telefones:
+          type: array
+          items:
+            type: object
+            properties:
+              option1:
+                type: object
+                properties:
+                  ddd:
+                    type: string
+                  numero:
+                    type: string
+                  phoneTypeId:
+                    type: integer
+                    format: int32
+                  authorize:
+                    type: boolean
+    CompanyRegistration:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: cpf do representante
+        cnpj:
+          type: string
+          description: "Senha do usuário. Obs: Aplicar algoritmo sha256"
+        senha:
+          type: string
+          description: Senha a ser cadastrada
+        email:
+          type: string
+          description: email da empresa a ser cadastrado
+        endereco:
+          type: object
+          properties:
+            logradouro:
+              type: string
+            numLogradouro:
+              type: string
+            bairro:
+              type: string
+            cep:
+              type: string
+            nomeMunicipio:
+              type: string
+            uf:
+              type: string
+        telefones:
+          type: array
+          items:
+            type: object
+            properties:
+              option1:
+                type: object
+                properties:
+                  ddd:
+                    type: string
+                  numero:
+                    type: string
+                  celular:
+                    type: boolean
+                  autorizador:
+                    type: boolean
+              option2:
+                  type: object
+                  properties:
+                    ddd:
+                      type: string
+                    numero:
+                      type: string
+                    celular:
+                      type: boolean
+                    autorizador:
+                      type: boolean
+    AuthMeSuccessResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Identificador do usuário ou da aplicação
+        name:
+          type: string
+          description: Nome do usuário ou da aplicação
+        email:
+          type: string
+          description: Email do usuário
+        organization:
+          type: string
+          description: Organização a qual o usuário pertence
+        userAccountInfo:
+          type: object
+          properties:
+            deprecatedDetails:
+              type: boolean
+            deprecatedPassword:
+              type: boolean
+            lastPasswordUpdate:
+              type: string
+            passwordExpirationDate:
+              type: string
+            has2FA:
+              type: boolean
+            twoFactorRequired:
+              type: boolean
+        tokenType:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    ClientInfoSuccessResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Identificador do usuário ou da aplicação
+        name:
+          type: string
+          description: Nome do usuário ou da aplicação
+        email:
+          type: string
+          description: Email do usuário
+        organization:
+          type: string
+          description: Organização a qual o usuário pertence
+        userAccountInfo:
+          type: object
+          properties:
+            deprecatedDetails:
+              type: boolean
+            deprecatedPassword:
+              type: boolean
+            lastPasswordUpdate:
+              type: string
+            passwordExpirationDate:
+              type: string
+            has2FA:
+              type: boolean
+            twoFactorRequired:
+              type: boolean
+        token:
+          type: string
+          description: Token Jwt.
+        tokenType:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    AppCredentilasSuccessResponse:
+      type: object
+      properties:
+        client:
+          type: object
+          properties:
+            title:
+              type: string
+              description: Nome da aplicação
+            appKey:
+              type: string
+              description: Chave da aplicação
+            acronym:
+              type: string
+            id:
+              type: integer
+              format: int32
+        token:
+          type: string
+        tokenType:
+          type: string
+        roles:
+          type: array
+          items:
+            type: object
+    SessionCredentialsSuccessResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token de permissões
+        redirect:
+          type: string
+    AuthBodyResponse:
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/ClientInfoSuccessResponse'
+    ApiErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        details:
+          type: string
+        message:
+          type: string
+        errorCode:
+          type: integer
+          format: int32
+    DigitalCertResponse:
+      type: object
+      properties:
+        token:
+          type: string
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://petstore.swagger.io/oauth/dialog
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
