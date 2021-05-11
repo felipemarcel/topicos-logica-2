@@ -1,0 +1,2268 @@
+openapi: 3.0.1
+info:
+  title: Acesso cidadão
+  description: API para consumo de informações relacionadas aos cidadãos, organizaçõese
+    e serviços do governo do estado do Ceará
+  contact:
+    email: felipe.marcel@insightlab.ufc.br
+  version: 0.0.1
+servers:
+- url: http://18.212.0.161:9000/api
+paths:
+
+  /auth:
+    post:
+      tags:
+      - Autenticação
+      summary: Autenticação de aplicação, pessoa física e jurídica através de identificador e senha ou através de certificado digital.
+      description: Esse endpoint faz parte de um fluxo de 2 requisições que devem ser feitas para que um usuário esteja autenticado e autorizado. Esta requisição é feita especificamente para obter informações básicas sobre o usuário e para obter um token do tipo `grant` que será trocado por um token do tipo `access`. Em outras palavras, esta requisição apenas autentica o usuário, portanto para o fluxo de autenticação e autorização, ela é a primeira requisição que deve ser feita. Obs - Esse endpoint pode receber 5 tipos de entidades em seu `body`  Usuários (cidadãos e servidores) com CPF e senha ou com certificado digital, Empresas com CNPJ e senha ou com certificado digital, e Aplicação com appKey, appServerKey e secret. Para autenticação e autorização de uma aplicação não é necessário seguir o fluxo completo, basta efetuar essa requisição e uma aplicação poderá consumir informações de qualquer outra aplicação.
+      operationId: authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/UserCredentials'
+                - $ref: '#/components/schemas/AppCredentials'
+                - $ref: '#/components/schemas/DigitalCerticateCredentials'
+                - $ref: '#/components/schemas/CompanyCredentials'
+                - $ref: '#/components/schemas/CompanyDigitalCertificateCredentials'
+            examples:
+              Usuário:
+                value:
+                  cpf: "11122233344"
+                  password: "cef14f3c248582f2cfa2b8152c4c2f919c27da88c7f0353d3a032aa3c8ba451b"
+              Aplicação:
+                value:
+                  appKey: "e70b335a916a6429f9964c5e29e69048"
+                  appServerKey: "80c93ebdf57d3836da3086d3d0a998ee"
+                  secret: "E5B9BEAE815BD6BD98434ABD46A4A"
+              Certificado Digital CPF:
+                value:
+                  cpf: "11122233344"
+                  token: "GcZRRtmguU2bg9F3SM9_LA"
+                  certificate: ""
+                  signature: ""
+              CNPJ:
+                value:
+                  cnpj: "94163589000192"
+                  password: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
+              Certificado Digital CNPJ:
+                value:
+                  cnpj: "94163589000192"
+                  token: "GcZRRtmguU2bg9F3SM9_LA"
+                  certificate: ""
+                  signature: ""
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ClientInfoSuccessResponse'
+                  - $ref: '#/components/schemas/AppCredentilasSuccessResponse'
+              examples:
+                ClientInfoSuccessResponse:
+                  value:
+                    client:
+                      userId: 05750019330
+                      name: ULISSES QUEIROZ DA SILVA
+                      email: ulisses.queiroz@insightlab.ufc.br
+                      organization: Cidadão Brasileiro
+                      userAccountInfo:
+                        deprecatedDetails: false
+                        deprecatedPassword: false
+                        lastPasswordUpdate: '2021-03-29T12:06:44-03:00'
+                        passwordExpirationDate: '2313-07-09T11:54:01-03:00'
+                        has2FA: false
+                        twoFactorRequired: true
+                    token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o
+                    tokenType: grant
+                    roles: []
+                AppCredentilasSuccessResponse:
+                  value:
+                    client:
+                      title: PORTAL
+                      appKey: e70b335a916a6429f9964c5e29e69048
+                      acronym: PORTAL
+                      id: 11
+                    token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDQzNTksImlkZW50aWZpZXIiOiJlNzBiMzM1YTkxNmE2NDI5Zjk5NjRjNWUyOWU2OTA0OCIsInRva2VuVHlwZSI6ImFjY2VzcyIsInRva2VuTnVtYmVyIjoxLCJjbGllbnRUeXBlIjoiYXBwbGljYXRpb24iLCJhcHBTZXJ2ZXJLZXkiOiI4MGM5M2ViZGY1N2QzODM2ZGEzMDg2ZDNkMGE5OThlZSJ9.OgZshD6KcsxPGcauF49ZT84w3YQU2kHjOgMgZohBwEw
+                    tokenType: access
+                    roles:
+                      - role: ROLE_SEGURANCA_GER_ATUALIZAR
+                      - role: ROLE_SEGURANCA_GER_BUSCAR
+                      - role: ROLE_SEGURANCA_USU
+                      - role: ROLE_SEGURANCA_CID
+                      - role: ROLE_SEGURANCA_ADM
+                      - role: ROLE_SEGURANCA_GER_ADICIONAR
+        400:
+          description: Codigos de erros ao autenticar cidadão
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Credencias inválidas:
+                  value:
+                    status: 400
+                    details: Cliente não possui permissões para acessar o sistema.
+                    message: Cliente não possui permissões para acessar o sistema
+                    code: 1
+                Identificador inválido:
+                  value:
+                    status: 400
+                    details: Identificador informado está incorreto
+                    message: Erro ao autenticar acesso do usuário
+                    code: 2
+                Não autorizado:
+                  value:
+                    status: 400
+                    details: Dados de autenticação enviados são invalidos
+                    message: Erro ao autenticar acesso do usuário
+                    code: 3
+          
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/2fa/validate:
+    post:
+      tags:
+      - Autenticação
+      summary: Autorização de pessoa física 2fa
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/2faValidate'
+            example:
+              code: '860159'
+      responses:
+        200:
+          description: sucess
+        400:
+          description: Codigo de erro ao não encontrar telefone autorizado
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Credencias inválidas:
+                  value:
+                    status: 400
+                    details: Não foi possível encontrar nenhum telefone autorizador cadastrado.
+                    message: Verifique se o telefone está cadastrado corretamente
+                    code: 70
+                Cliente Desabilitado:
+                  value:
+                    status: 400
+                    details: Cliente Desabilitado
+                    message: Cliente Desabilitado
+                    code: 2
+                Código Inválido:
+                  value:
+                    status: 400
+                    details: O código informado não corresponde ao código enviado.
+                    message: Código de validação da autenticação em 2 etapas inválido.
+                    code: 72
+                Tempo Expirado:
+                  value:
+                    status: 400
+                    details: Tempo para verificação expirado
+                    message: O tempo para realizar a autenticação em 2 etapas expirou. Por favor, efetue novamente o login
+                    code: 74
+        500:
+          description: Autenticação em duas etapas desabilitada
+          content:
+            ApiErrorResponseServer:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                status: 500
+                message: A autenticação em 2 etapas não está habilitada
+                errorCode: 71
+  /auth/generate:
+    post:
+      tags:
+      - Autenticação
+      summary: Autorização de pessoa física e jurídica através de identificador e senha ou através de certificado digital.
+      description: Esse endpoint faz parte de um fluxo de 2 requisições que devem ser feitas para que um usuário esteja autenticado e autorizado. Esta requisição é feita especificamente para trocar o token do tipo `grant` por um token do tipo `access`. Em outras palavras, esta requisição autoriza o acesso de um usuário à uma aplicação.
+      operationId: authorization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCredentials'
+            example:
+              token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg4NjgxNzMsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.uzmkXqDsh4f4vKFjfQ33GvHYg1EitAkkaiMZi-VYO4c"
+              appServerKey: "80c93ebdf57d3836da3086d3d0a998ee"
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCredentialsSuccessResponse'
+              example:
+                token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg4NjgzMDgsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImFjY2VzcyIsInRva2VuTnVtYmVyIjoxLCJjbGllbnRUeXBlIjoidXNlciIsImFwcFNlcnZlcktleSI6IjgwYzkzZWJkZjU3ZDM4MzZkYTMwODZkM2QwYTk5OGVlIn0.9nw6HYdwdQOvAnZddsKn-WrinLlcTPKG2X3OLQknRjQ
+                redirect: 'http://50.17.69.232:3000/home'
+                
+        400:
+          description: Erro apresentado quando um usuário ou aplicação estão desabilitados, ou usuário não tem permissões
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Apicação desabilitada:
+                  value:
+                    status: 400
+                    details: Não é possivel efetuar o login. A aplicação esta desabilitada no sistema
+                    message: Não é possivel efetuar o login. A aplicação esta desabilitada no sistema
+                    errorcode: 1
+                Cliente desabilitado:
+                  value:
+                    status: 400
+                    details: Cliente desabilitado
+                    message: Cliente desabilitado
+                    errorcode: 2
+                Token inválido:
+                  value:
+                    status: 400
+                    details: Token inválido ou invalidado
+                    message: O token enviado não está de acordo com o token gerado pelo sistema!
+                    errorcode: 30
+                Usuário sem permissões:
+                  value:
+                    status: 400
+                    details: Usuário sem permissões para acessar aplicação
+                    message: O usuário não possui permissões suficientes para acessar a aplicação
+                    errorcode: 31
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/me:
+    get:
+      tags:
+      - Autenticação
+      summary: Retorna informações do usuário corrente. O usuário corrente é identificado pelo token
+      operationId: receiveCustomerInformation
+      parameters:
+      - in: header
+        name: Header
+        description: A requisição espera receber no cabeçalho os parâmetros Token e Accept-Client. O primeiro está relacionado ao token obtido na requisição /auth/generate e o segundo está relacionado ao id da aplicação ou appServerKey.
+        required: true
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthMeSuccessResponse'
+              example:
+                client:
+                  userId: 05750019330
+                  name: ULISSES QUEIROZ DA SILVA
+                  email: ulisses.queiroz@insightlab.ufc.br
+                  organization: Cidadão Brasileiro
+                  userAccountInfo:
+                    deprecatedDetails: false
+                    deprecatedPassword: false
+                    lastPasswordUpdate: '2021-03-29T12:06:44-03:00'
+                    passwordExpirationDate: '2313-07-09T11:54:01-03:00'
+                    has2FA: false
+                    twoFactorRequired: true
+                tokenType: grant
+                roles: []
+                
+        400:
+          description: Erro ao solicitar dados do usuário
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Token inválido:
+                  value:
+                    status: 400
+                    details: Token enviado é inválido ou foi invalidado
+                    message: Problema no token informado para obter informações do usuário
+                    errorcode: 30
+                Token não é do tipo 'Access':
+                  value:
+                    status: 400
+                    details: Token enviado é de grant mas espera-se um token de access
+                    message: Não é possível realizar autenticação com o grant
+                    errorcode: 32
+                Token de outra aplicação:
+                  value:
+                    status: 400
+                    details: Token enviado pertence a outra aplicação
+                    message: O token não pertence a aplicação
+                    errorcode: 33
+                Token de acesso esperado:
+                  value:
+                    status: 400
+                    details: Para obter os dados do usuário na aplicação desejada, o token enviado deve ser do tipo ACCESS
+                    message: Só tokens de acesso podem ser validados para uma aplicação
+                    errorcode: 34
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /auth/digital-cert:
+    get:
+      tags:
+      - Autenticação
+      summary: Obtém um token de uso único por requisição para iniciar o fluxo de autenticação usando certificado digital
+      operationId: require
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DigitalCertResponse'
+        500:
+          description: Erro ao solicitar dados do usuário
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                  status: 500
+                  details: Erro ao iniciar fluxo de autenticação por certificado digital. Por favor, tente novamente mais tarde
+                  message: Erro ao iniciar fluxo de autenticação por certificado digital
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  
+  /citizen:
+    post:
+      tags:
+      - Cadastro
+      summary: Registrar cidadão
+      operationId: registerCitizen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CitizenRegistry'
+            example:
+              identifier: 05485320520
+              email: email@email.com
+              name: Dono Company
+              password: ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c
+              address:
+                zipCode: '61942345'
+                address: Rua X
+                addressNumber: '79'
+                district: Aldeota
+                addressCityName: Fortaleza
+                addressStateName: Ceará
+                addressComplement: Complemento ...
+              phones:
+                - ddd: '85'
+                  number: '85999998888'
+                  phoneTypeId: 1
+                  authorize: true
+              
+              
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: Codigos de erros ao cadastrar cidadão
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Email inválido:
+                  value:
+                    status: 400
+                    details: Email informado não é válido
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 1
+                Cpf inválido:
+                  value:
+                    status: 400
+                    details: CPF informado não é válido, verifique os dados
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 2
+                Usuário existente:
+                  value:
+                    status: 409
+                    details: Usuário já está em uso
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 3
+                Telefone Obrigatório:
+                  value:
+                    status: 400
+                    details: Deve ser enviado pelo menos algum telefone
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 4
+                Telefone Inválido:
+                  value:
+                    status: 400
+                    details: Um dos telefones enviados está com o formato incorreto
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 5
+                Telefone Celular com Autorização:
+                  value:
+                    status: 400
+                    details: Deve existir exatamente um telefone celular enviado que é autorizador
+                    message: Erro ao tentar inserir os dados do cidadão. Por favor, confira a requisição enviada e tente novamente
+                    code: 6
+                Email Já Cadastrado:
+                  value:
+                    status: 400
+                    details: O email enviado já está sendo utilizado no sistema!
+                    message: O email enviado já está sendo utilizado no sistema!
+                    code: 7
+                Tipo Do Telefone Inválido:
+                  value:
+                    status: 400
+                    details: Tipo de telefone enviado não é válido
+                    message: O tipo de telefone informado não é válido. Formatos válidos são 1 para telefone fixo, 2 para celular e 3 para corporativo.
+                    code: 8
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+      
+  /company:
+    post:
+      tags:
+      - Cadastro
+      summary: Registrar empresa
+      operationId: registerCompany
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyRegistration'
+            example:
+              cpf: "05485320520"
+              cnpj: "96914479089"
+              senha: "ea417877b08c9f7cc55086e5e22499416b27d988a47434ebfdf9d31ad991c38c"
+              email: "mycompanymail@email.com"
+              endereco: 
+                logradouro: "Rua Tal"
+                numLogradouro: "123"
+                bairro: "Serrinha"
+                cep: "60742755"
+                nomeMunicipio: "Fortaleza"
+                nomeEstado: "Ceara"
+              telefones:
+                [{
+                  ddd: "85",
+                  numero: "988889999",
+                  celular: true,
+                  autorizador: true
+                },
+                {
+                  ddd: "85",
+                  numero: "988889999",
+                  celular: true,
+                  autorizador: true
+                }]
+        required: false
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthBodyResponse'
+        400:
+          description: Codigos de erros ao cadastrar empresa
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                Telefone não informado:
+                  value:
+                    status: 400
+                    details: Telefone não informado, é necessário informar pelo menos um telefone válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 1
+                Telefone inválido:
+                  value:
+                    status: 400
+                    details: Telefone com formato inválido. Formatos esperados - ddd 123456789 ou ddd 12345678
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 2
+                Cnpj não encontrado:
+                  value:
+                    status: 400
+                    details: Não foi possível encontrar o CNPJ informado
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 3
+                Representante não disponivel:
+                  value:
+                    status: 400
+                    details: CPF do representante não disponível.
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 4
+                Cpf do representante não encontrado:
+                  value:
+                    status: 400
+                    details: O CPF do representante informado difere do CPF do representante desse CNPJ!
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 5
+                Cnpj repetido:
+                  value:
+                    status: 400
+                    details: CNPJ já em uso, insiira um novo cnpj válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 6
+                Representante não cadastrado:
+                  value:
+                    status: 400
+                    details: CPF do representante não cadastrado
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 7
+                Telefone autorizador não informado:
+                  value:
+                    status: 400
+                    details: Deve ser enviado exatamente um numero celular que seja autorizador
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 8
+                Email inválido:
+                  value:
+                    status: 400
+                    details: Email informado não é válido
+                    message: Erro ao tentar inserir os dados da empresa. Por favor, confira a requisição enviada e tente novamente
+                    code: 9
+                Email Já Em Uso:
+                  value:
+                    status: 400
+                    details: O email enviado já está sendo utilizado no sistema!
+                    message: O email enviado já está sendo utilizado no sistema!
+                    code: 10
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      x-codegen-request-body-name: body
+  /users/recovery/{userEmail}:
+    get:
+      tags:
+      - Recuperação de Senha
+      summary: Solicitar recuperação de senha via email
+      operationId: Recovry
+      parameters:
+      - in: path
+        name: userEmail
+        description: Envio de email para recuperar a senha
+        schema:
+          type: object
+        required: true
+      responses:
+        200:
+          description: Instruções para recuperação de senha foram enviado para email informado
+          content:
+            application/json:
+              example:
+                status: 200
+                details: Instruções enviadas para email informado
+                message: Instruções enviadas para email informado
+        400:
+          description: Erro ao tentar recuperar senha
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              example:
+                status: 400
+                details: Email informado não é válido 
+                message: Email informado não é válido
+  
+  /user-details/personal{userID}:
+    patch:
+      tags:
+      - Perfil Pessoal
+      summary: Entrada de dados para atualizar perfil pessoal
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee" 
+      responses:
+        200:
+          description: Informações da atualização do perfil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalProfile'
+              example:
+                birth:
+                  cityId: 996
+                  countryId: 1
+                  date: "2021-05-11"
+                  stateId: 1
+                bloodTypeId: 3
+                deficient: true
+                email: "ulissesjapp@gmail.com"
+                firstAffiliation:
+                  name: "Maria Fulano"
+                  sexId: 2
+                genderIdentity: 0
+                id: 4
+                image: "data:image/jpeg;base64,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"
+                maritalStatusId: 2
+                name: "Ulisses Queiroz"
+                nationalityCountryId: 1
+                nationalityTypeId: 1
+                organDonor: false
+                rhFactorId: 2
+                secondAffiliation:
+                  name: "João Sicrano"
+                  sexId: 1
+                sexId: 1
+                sinespId: "05750019330"
+                skinColorId: 1
+                socialName: "Ulisses Queiroz"
+  
+  /sex:
+    get:
+      tags:
+      - Perfil Pessoal
+      summary: Endpoint usado para recuperar sexos cadastrados no sistema
+      operationId: EditarSexo
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos sexos cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilSexo'
+              example:
+                - id: 1
+                  label: Masculino
+                - id: 2
+                  label: Feminino
+                - id: 3
+                  label: Não informado
+  /rh-factors:
+    get:
+      tags:
+      - Perfil Pessoal
+      summary: Endpoint usado para recuperar fatores RH cadastrados no sistema
+      operationId: EditarFatorRH
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos fatores RH cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilRhFactor'
+              example:
+              - id: 1
+                label: Positivo
+              - id: 2
+                label: Negativo
+                
+  /skin-colors:
+    get:
+      tags:
+      - Perfil Pessoal
+      summary: Endpoint usado para recuperar tons de pele cadastrados no sistema
+      operationId: EditarCorDePele
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos tons de peles cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilSkinColors'
+              example:
+              - - id: 1
+                  label: Amarela
+                - id: 2
+                  label: Branca
+                - id: 3
+                  label: Parda
+                - id: 4
+                  label: Indígena
+                - id: 5
+                  label: Preta
+  
+  /blood-types:
+    get:
+      tags:
+      - Perfil Pessoal
+      summary: Endpoint usado para recuperar tipos sanguíneos cadastrados no sistema
+      operationId: EditarTipoSanguineo
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos tipos sanguíneos cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilBloodType'
+              example:
+              - - - id: 1
+                    label: A
+                  - id: 2
+                    label: B
+                  - id: 3
+                    label: AB
+                  - id: 4
+                    label: O
+  
+  /marital-status:
+    get:
+      tags:
+      - Perfil Pessoal
+      summary: Endpoint usado para recuperar estado civil cadastrado no sistema
+      operationId: EditarEstadoCivil
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno do estado civil cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilMaritalStatus'
+              example:
+                - id: 1
+                  label: Casado
+                - id: 2
+                  label: Solteiro
+                - id: 3
+                  label: Divorciado
+                - id: 4
+                  label: Viúvo
+                - id: 5
+                  label: Separado Consensualmente
+                - id: 6
+                  label: Separado Judicialmente
+                - id: 7
+                  label: Desquitado
+                - id: 8
+                  label: Outros
+  
+  /nationalities:
+    get:
+      tags:
+      - Perfil Pessoal
+      summary: Endpoint usado para recuperar tipo nacionalidade cadastrado no sistema
+      operationId: EditarNacionalidade
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos tipos de nacionalidade cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilNationalities'
+              example:
+               - id: 1
+                 label: Brasileiro
+               - id: 2
+                 label: Naturalizado
+               - id: 3
+                 label: Estrangeiro
+               - id: 4
+                 label: Brasileiro nascido no exterior
+  /gender-identities:
+    get:
+      tags:
+      - Perfil Pessoal
+      summary: Endpoint usado para recuperar identidade de gênero cadastrado no sistema
+      operationId: EditarIdentidadeDeGenero
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno das identidades de gênero cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilGenderIdentities'
+              example:
+               - - id: 1
+                   label: Homem Trans
+                 - id: 2
+                   label: Mulher Trans
+  
+  /user-details/documents/{userID}:
+    patch:
+      tags:
+      - Perfil Documentação
+      summary: Entrada de dados para atualizar documentação
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee" 
+      responses:
+        200:
+          description: Informações da atualização do perfil 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentationProfile'
+              example:
+                cnh: "32715195100"
+                cnhCategoryId: 2
+                cnhExpirationDate: "2023-11-07"
+                cnhIssueDate: "2019-03-01"
+                cnhIssueLocation: "Detran"
+                cnhUfId: 1
+                id: 0
+                passport:
+                  country: 1
+                  expirationDate: "2021-05-08"
+                  issueDate: "2020-03-30"
+                  number: "0090909087070778"
+                  serialNumber: "897789"
+                rg: "20093523436"
+                rgIssueDate: "2009-09-10"
+                rgIssueInstitution: "ssp"
+                rgStateId: 1
+                sinespId: "05750019330"
+                visaExpirationDate: "2021-05-11"
+                visaTypeId: 2
+                voterRegistration: "8122 2027 0175"
+                voterSection: "71"
+                voterUfId: 25
+                voterZone: "004"
+  /cnh-categories:
+    get:
+      tags:
+      - Perfil Documentação
+      summary: Endpoint usado para recuperar categorias de CNH cadastrados no sistema
+      operationId: EditarCategoriaCNH
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno das categorias de cnh cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CnhType'
+              example:
+                - id: 1
+                  label: A
+                - id: 2
+                  label: AB
+                - id: 3
+                  label: AC
+                - id: 4
+                  label: ACC
+                - id: 5
+                  label: AD
+                - id: 6
+                  label: AE
+                - id: 7
+                  label: B
+                - id: 8
+                  label: C
+                - id: 9
+                  label: D
+                - id: 10
+                  label: E
+  
+  /visa-types:
+    get:
+      tags:
+      - Perfil Documentação
+      summary: Endpoint usado para recuperar tipos de vistos cadastrados no sistema
+      operationId: EditarTipoVisto
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos tipos de vistos cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocTipoVisto'
+              example:
+                - id: 1
+                  label: Turista
+                - id: 2
+                  label: Temporário
+                - id: 3
+                  label: Visita
+                - id: 4
+                  label: Diplomático
+                - id: 5
+                  label: Oficial
+                - id: 6
+                  label: Cortesia
+                - id: 7
+                  label: Trânsito
+                - id: 8
+                  label: Pesquisa/Ensino/Extensão Acadêmica
+                - id: 9
+                  label: Residência Temporária
+                - id: 10
+                  label: Temporário de Aperfeiçoamento Médico
+                - id: 11
+                  label: Visto de Visita por meio eletrônico
+                
+                
+  /user-details/communication/{userID}:
+    patch:
+      tags:
+      - Perfil Comunicação
+      summary: Entrada de dados para atualizar comunicação
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee" 
+      responses:
+        200:
+          description: Informações da atualização do perfil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationProfile'
+              example:
+               id: 4
+               sinespId: 05750019330
+               address: Rua José Pinheiro Pessoa
+               addressNumber: '91'
+               district: Outra Banda
+               zipCode: '61942345'
+               countryId: 1
+               addressStateId: 1
+               addressCityId: 996
+               userPhones:
+                 - id: 4
+                   userDetailsId: 4
+                   number: '85997251959'
+                   phoneTypeId: 1
+                   authorize: true
+                   countryCode: 55
+  
+  /countries:
+    get:
+      tags:
+      - Perfil Comunicação
+      summary: Endpoint usado para recuperar estados de emissão do RG cadastrados no sistema
+      operationId: EditarPais
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos estados onde podem ser emitidos RG
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilPais'
+              example:
+                - id: 1
+                  name: Brasil
+                
+  /states:
+    get:
+      tags:
+      - Perfil Comunicação
+      summary: Endpoint usado para recuperar estados de emissão do RG cadastrados no sistema
+      operationId: EditarEstadoDocumentaçãoRG
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos estados onde podem ser emitidos RG
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstadoRG'
+              example:
+                - id: 3
+                  name: Acre
+                  uf: AC
+                  ibgeId: 12
+                  countryId: 1
+                - id: 7
+                  name: Alagoas
+                  uf: AL
+                  ibgeId: 27
+                  countryId: 1
+                - id: 9
+                  name: Bahia
+                  uf: BA
+                  ibgeId: 29
+                  countryId: 1
+                - id: 1
+                  name: Ceará
+                  uf: CE
+                  ibgeId: 23
+                  countryId: 1
+                - id: 11
+                  name: Espírito Santo
+                  uf: ES
+                  ibgeId: 32
+                  countryId: 1
+                - id: 12
+                  name: Goiás
+                  uf: GO
+                  ibgeId: 52
+                  countryId: 1
+                - id: 13
+                  name: Maranhão
+                  uf: MA
+                  ibgeId: 21
+                  countryId: 1
+                - id: 16
+                  name: Minas Gerais
+                  uf: MG
+                  ibgeId: 31
+                  countryId: 1
+                - id: 17
+                  name: Paraíba
+                  uf: PB
+                  ibgeId: 25
+                  countryId: 1
+                - id: 19
+                  name: Pernambuco
+                  uf: PE
+                  ibgeId: 26
+                  countryId: 1
+                - id: 20
+                  name: Piauí
+                  uf: PI
+                  ibgeId: 22
+                  countryId: 1
+                - id: 23
+                  name: Rio de Janeiro
+                  uf: RJ
+                  ibgeId: 33
+                  countryId: 1
+                - id: 22
+                  name: Rio Grande do Sul
+                  uf: RS
+                  ibgeId: 43
+                  countryId: 1
+                - id: 2
+                  name: Rondônia
+                  uf: RO
+                  ibgeId: 11
+                  countryId: 1
+                - id: 26
+                  name: Sergipe
+                  uf: SE
+                  ibgeId: 28
+                  countryId: 1
+                - id: 27
+                  name: Tocantins
+                  uf: TO
+                  ibgeId: 17
+                  countryId: 1
+  
+  /cities:
+    get:
+      tags:
+      - Perfil Comunicação
+      summary: Endpoint usado para recuperar cidades cadastrados no sistema
+      operationId: EditarCidade
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno das cidades cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilCidade'
+              example:
+                - id: 5326
+                  name: Acreúna
+                  ibgeId: 134
+                  stateId: 12
+                - id: 1077
+                  name: Açu
+                  ibgeId: 208
+                  stateId: 21
+                - id: 2249
+                  name: Açucena
+                  ibgeId: 500
+                  stateId: 16
+                - id: 1656
+                  name: Barra de São Miguel
+                  ibgeId: 607
+                  stateId: 7
+                - id: 5198
+                  name: Barra do Bugres
+                  ibgeId: 1704
+                  stateId: 14
+                - id: 3328
+                  name: Barra do Chapéu
+                  ibgeId: 5351
+                  stateId: 25
+                - id: 2364
+                  name: Campestre
+                  ibgeId: 11002
+                  stateId: 16
+                - id: 4675
+                  name: Campestre da Serra
+                  ibgeId: 3673
+                  stateId: 22
+                - id: 4771
+                  name: Fazenda Vilanova
+                  ibgeId: 8078
+                  stateId: 22
+                - id: 60
+                  name: Feijó
+                  ibgeId: 302
+                  stateId: 3
+                - id: 1569
+                  name: Macaparana
+                  ibgeId: 9006
+                  stateId: 19
+                - id: 2064
+                  name: Macarani
+                  ibgeId: 19702
+                  stateId: 9
+                - id: 1394
+                  name: Prata
+                  ibgeId: 12200
+                  stateId: 17
+                - id: 2906
+                  name: Salinas
+                  ibgeId: 57005
+                  stateId: 16
+                - id: 2162
+                  name: Salinas da Margarida
+                  ibgeId: 27309
+                  stateId: 9
+                - id: 1058
+                  name: Sobral
+                  ibgeId: 12908
+                  stateId: 1
+  
+  /patents:
+    get:
+      tags:
+        - Perfil Profissional
+      summary: Recuperar as patentes cadastradas no sistema
+      operationId: EditarPatente
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            type: object
+            example:
+              Authorization: >-
+                eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o
+              Accept-Client: 80c93ebdf57d3836da3086d3d0a998ee
+          required: false
+      responses:
+        200:
+          description: Retorno dos tipos de patentes cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilPatente'
+              example: ainda não há patentes cadastradas
+  
+  /inss-declarations:
+    get:
+      tags:
+        - Perfil Profissional
+      summary: >-
+        Recuperar as informações previdenciárias referentes aos tipos de
+        declaração de INSS cadastradas no sistema
+      operationId: EditarDeclaracaoInss
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            type: object
+            example:
+              Authorization: >-
+                eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o
+              Accept-Client: 80c93ebdf57d3836da3086d3d0a998ee
+          required: true
+      responses:
+        '200':
+          description: Retorno dos tipos de declaração de INSS cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilDeclaracaoInss'
+              example:
+                - id: 1
+                  label: Não contribuo
+                - id: 2
+                  label: Contribuo para regime próprio de previdência social
+                - id: 3
+                  label: Contribuo para regime geral de previdência social
+                - id: 4
+                  label: Não informado
+                  
+  /organizations-minimized:
+    post:
+      tags:
+        - Perfil Profissional
+      summary: Endpoint usado para recuperar as unidades organizacionais cadastradas no sistema
+      operationId: EditarUnidadeOrganizacional
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: true
+        - in: query
+          name: parentId
+          schema:
+            type: integer
+          required: false
+        - in: query
+          name: size
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Retorno dos tipos de unidades organizacionais cadastradas no sistema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilOrganizations'
+              example:
+              - id: 3
+                title: ESFERA ESTADUAL
+                acronym: EST
+                path:
+                  - 3
+              - id: 2
+                title: ESFERA FEDERAL
+                acronym: FED
+                path:
+                  - 2
+              - id: 5
+                title: ESFERA INTERNACIONAL
+                acronym: INT
+                path:
+                  - 5
+              - id: 4
+                title: ESFERA MUNICIPAL
+                acronym: MUN
+                path:
+                  - 4
+  /bank:
+    get:
+      tags:
+        - Perfil Informações Adicionais
+      summary: Endpoint para recuperar os bancos cadastrados no sistema
+      operationId: EditarBanco
+      responses:
+        200:
+          description: Retorno dos bancos cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilBanco'
+              example:
+                Ainda não há bancos cadastrados
+                
+  /bank-accounts:
+    get:
+      tags:
+        - Perfil Informações Adicionais
+      summary: Recuperar os tipos de conta de banco cadastradas no sistema
+      operationId: EditarTipoConta
+      responses:
+        200:
+          description: Retorno dos tipos de conta de banco
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilTiposContas'
+              example:
+              - id: 1
+                label: Corrente
+              - id: 2
+                label: Poupança
+              - id: 3
+                label: Salário
+                
+  /rne-classifications:
+    get:
+      tags:
+        - Perfil Informações Adicionais
+      summary: Recuperar o tipo de Registro Nacional Migratório
+      operationId: EditarRneClassification
+      responses:
+        200:
+          description: Retorno dos tipos de classificação do Registro Nacional Migratório
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerfilClassificacaoRne'
+              example:
+                - id: 1
+                  label: Temporário
+                - id: 2
+                  label: Permanente
+components:
+  schemas:
+    PersonalProfile:
+      type: object
+      properties:
+        birth:
+          type: object
+          properties:
+            cityId:
+              type: integer
+              format: num32
+              description: Código da cidade
+            countryId:
+              type: integer
+              format: num32
+              description: Código da país
+            date:
+              type: string
+              description: Data de nascimento
+            stateId:
+              type: integer
+              format: num32
+              description: Código do estado
+        bloodTypeId:
+          type: integer
+          format: num32
+          description: Id do tipo sanguíneo
+        deficient:
+          type: boolean
+          description: Confirmação de deficiência
+        email:
+          type: string
+          description: Email do usuário
+        firstAffiliation:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nome da Filiação
+            sexId:
+              type: integer
+              format: num32
+              description: Id do sexo da filiação
+        genderIdentity:
+          type: integer
+          format: num32
+          description: Id que identifica o genêro
+        id:
+          type: integer
+          format: num32
+          description: Id que identifica o usuário
+        image:
+          type: string
+          description: Foto escolhida pelo usuário para o perfil
+        maritalStatusId:
+          type: integer
+          format: num32
+          description: Id que identifica o estado civil
+        name:
+          type: string
+          description: Nome do usuário
+        nationalityCountryId:
+          type: integer
+          format: num32
+          description: Id que identifica país da nacionalidade
+        nationalityTypeId:
+          type: integer
+          format: num32
+          description: Id que identifica o tipo de nacionalidade
+        organDonor:
+          type: boolean
+          description: Identifica se o usuário é doador de orgãos
+        rhFactorId:
+          type: integer
+          format: num32
+          description: Id que identifica o fator RH sanguíneo
+        secondAffiliation:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nome da Filiação
+            sexId:
+              type: integer
+              format: num32
+              description: Id do sexo da filiação
+        sexId:
+          type: integer
+          format: num32
+          description: Id que identififca o sexo do usuário
+        sinespId:
+          type: string
+          description: Cpf do usuário que é usado como identificador
+        skinColorId:
+          type: integer
+          format: num32
+          description: Id que identifica o tom de pele do usuário
+        socialName:
+          type: string
+          description: Nome social que o usuário deseja que seja usado
+    PerfilSexo:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica o tipo de sexo
+          label:
+            type: string
+            description: descreve o sexo para o perfil
+    PerfilRhFactor:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica o fator RH
+          label:
+            type: string
+            description: descreve o fator rh para o perfil
+    PerfilSkinColors:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica a cor
+          label:
+            type: string
+            description: descreve o tom de pele para o perfil
+    PerfilBloodType:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica o tipo sanguíneo
+          label:
+            type: string
+            description: descreve o tipo sanguíneo para o perfil
+    PerfilMaritalStatus:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica o estado civil
+          label:
+            type: string
+            description: descreve o estado civil para o perfil
+    PerfilNationalities:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica o tipo de nacionalidade
+          label:
+            type: string
+            description: descreve o tipo de nacionalidade para o perfil
+    PerfilGenderIdentities:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica a identidade de gênero
+          label:
+            type: string
+            description: descreve a identidade de gênero para o perfil
+    CnhType:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica categoria da cnh
+          label:
+            type: string
+            description: descreve a categoria da cnh
+    DocTipoVisto:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica tipo de visto
+          label:
+            type: string
+            description: descreve o tipo de visto
+    EstadoRG:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: Id que identifica o estado
+          name:
+            type: string
+            description: Nome do estado
+          uf:
+            type: string
+            description: Sigla do estado
+          ibgeId:
+            type: integer
+            format: num32
+            description: Códigos dos estados IBGE
+          countryId:
+            type: integer
+            format: num32
+            description: Códigos do país
+    PerfilCidade:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: Id que identifica o estado
+          name:
+            type: string
+            description: Nome do município
+          ibgeId:
+            type: integer
+            format: num32
+            description: Códigos dos municípios IBGE
+          stateId:
+            type: integer
+            format: num32
+            description: Códigos do estado
+    PerfilPais:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: Id que identifica o país
+          name:
+            type: string
+            description: Nome do país
+    DocumentationProfile:
+      type: object
+      properties:
+        cnh:
+          type: string
+          description: Identificação da carteira nacional de habilitação
+        cnhCategoryId:
+          type: integer
+          format: num32
+          description: Id que identifica a categoria da CNH
+        cnhExpirationDate:
+          type: string
+          description: Data de Vencimanto
+        cnhIssueDate:
+          type: string
+          description: Data de emissão
+        cnhIssueLocation:
+          type: string
+          description: Local onde foi emitido CNH
+        cnhUfId:
+          type: integer
+          format: num32
+          description: Id que identifica estado em que cnh foi emitida
+        id:
+          type: integer
+          format: num32
+        passport:
+          type: object
+          properties:
+            country:
+              type: integer
+              format: num32
+              description: Id do país em que foi emitido passaporte
+            expirationDate:
+              type: string
+              description: Data de vencimento do passaporte
+            issueDate:
+              type: string
+              description: Data de emissão do passaporte
+            number:
+              type: string
+              description: Número do passaporte
+            serialNumber:
+              type: string
+              description: Número de série do passaporte
+        rg:
+          type: string
+          description: Registro Geral do usuário
+        rgIssueDate:
+          type: string
+          description: Data de emissão do RG
+        rgIssueInstitution:
+          type: string
+          description: Local da emissão do RG
+        rgStateId:
+          type: integer
+          format: num32
+          description: Id que identifica estado da emissão do RG
+        sinespId:
+          type: string
+          description: Identificador do usuário
+        visaExpirationDate:
+          type: string
+          description: Vencimento do visto
+        visaTypeId:
+          type: integer
+          format: num32
+          description: Id que identifica o tipo do visto
+        voterRegistration:
+          type: string
+          description: Identificador do título de eleitor
+        voterSection:
+          type: string
+          description: Seção da votação
+        voterUfId:
+          type: integer
+          format: num32
+          description: Id que identificar estado do título
+        voterZone:
+          type: string
+          description: Zona de votação
+    CommunicationProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: num32
+          description: Id que identifica usuário nas tabelas do banco
+        sinespId:
+          type: string
+          description: Identificador do usuário
+        address:
+          type: string
+          description: logradouro do usuário
+        addressNumber:
+          type: string
+          description: Número da residência
+        district:
+          type: string
+          description: Bairro do usuário
+        zipCode:
+          type: string
+          description: CEP do usuário
+        countryId:
+          type: integer
+          format: num32
+          description: Id da cidade
+        addressStateId:
+          type: integer
+          format: num32
+          description: Id do estado
+        addressCityId:
+          type: integer
+          format: num32
+          description: Id do país
+        userPhones:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: num32
+              userDetailsId:
+                type: integer
+                format: num32
+                description: Id que identifica usuário nas tabelas do banco
+              number:
+                type: string
+                description: Telefone ou celular do usuário
+              phoneTypeId:
+                type: integer
+                format: num32
+                description: Identifica o tipo de número, celular ou fixo
+              authorize:
+                type: boolean
+              countryCode:
+                type: integer
+                format: num32
+                description: Código do país
+    PerfilDeclaracaoInss:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica o tipo de declaração
+          label:
+            type: string
+            description: Descreve o tipo de declaração
+    PerfilPatente:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica o tipo de patente
+          label:
+            type: string
+            description: Descreve o tipo de patente
+    PerfilOrganizations:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            description: Id que especifica o tipo de unidade organizacional
+          title:
+            type: string
+            description: Descreve a unidade organizacional
+          acronym:
+            type: string
+            description: Acrônimo da unidade organizacional
+          path:
+            type: array
+            items:
+              type: integer
+            description: Não sei bem
+    PerfilBanco:
+      type: array
+      items:
+        type: object
+        # ainda não dá pra definir as properties
+    PerfilTiposContas:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Id que especifica o tipo de conta de banco
+          label:
+            type: string
+            description: O tipo de conta de banco
+    PerfilClassificacaoRne:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Id que especifica o tipo de classificação do Registro Nacional Migratório
+          label:
+            type: string
+            description: O tipo de classificação
+    2faValidate:
+      type: object
+    UserCredentials:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: CPF do usuário
+        password:
+          type: string
+          description: 'Senha do usuário. Obs: Aplicar algoritmo sha256.'
+    AppCredentials:
+      type: object
+      properties:
+        appKey:
+          type: string
+        appServerKey:
+          type: string
+        secret:
+          type: string
+    DigitalCerticateCredentials:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: cpf do usuário
+        token:
+          type: string
+          description: tolken gerado pela aplicação
+        certificate:
+          type: string
+          description: ''
+        signature:
+          type: string
+          description: ''
+    CompanyCredentials:
+      type: object
+      properties:
+        cnpj:
+          type: string
+          description: cnpj da empresa
+        password:
+          type: string
+          description: "Senha do usuário. Obs: Aplicar algoritmo sha256"
+    CompanyDigitalCertificateCredentials:
+      type: object
+      properties:
+        cnpj:
+          type: string
+          description: cnpj da empresa
+        token:
+          type: string
+          description: tolken gerado pela aplicação
+        certificate:
+          type: string
+          description: ''
+        signature:
+          type: string
+          description: ''
+    SessionCredentials:
+      type: object
+      properties:
+        token:
+          type: string
+          description: token de acesso fornecido pela aplicação
+        appServerKey:
+          type: string
+          description: é a mesma chave fornecida pela aplicação
+    Me:
+      type: object
+      properties:
+        Authorization:
+          type: string
+          description: Token obtido no endpoint /auth/generate
+        Accept-Client:
+          type: string
+    CitizenRegistry:
+      type: object
+      properties:
+        identifier:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        address:
+          type: object
+          properties:
+            zipCode:
+              type: string
+              description: CEP a ser informado
+            address:
+              type: string
+              description: Rua a ser informada
+            addressNumber:
+              type: string
+              description: Número da residência
+            district:
+              type: string
+              description: Bairro a ser informado
+            addressCityName:
+              type: string
+              description: Nome da cidade
+            addressStateName:
+              type: string
+              description: Nome do Estado
+            addressComplement:
+              type: string
+              description: Complementa do endereço
+        telefones:
+          type: array
+          items:
+            type: object
+            properties:
+              option1:
+                type: object
+                properties:
+                  ddd:
+                    type: string
+                  numero:
+                    type: string
+                  phoneTypeId:
+                    type: integer
+                    format: int32
+                  authorize:
+                    type: boolean
+    CompanyRegistration:
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: cpf do representante
+        cnpj:
+          type: string
+          description: "Senha do usuário. Obs: Aplicar algoritmo sha256"
+        senha:
+          type: string
+          description: Senha a ser cadastrada
+        email:
+          type: string
+          description: email da empresa a ser cadastrado
+        endereco:
+          type: object
+          properties:
+            logradouro:
+              type: string
+            numLogradouro:
+              type: string
+            bairro:
+              type: string
+            cep:
+              type: string
+            nomeMunicipio:
+              type: string
+            uf:
+              type: string
+        telefones:
+          type: array
+          items:
+            type: object
+            properties:
+              option1:
+                type: object
+                properties:
+                  ddd:
+                    type: string
+                  numero:
+                    type: string
+                  celular:
+                    type: boolean
+                  autorizador:
+                    type: boolean
+              option2:
+                  type: object
+                  properties:
+                    ddd:
+                      type: string
+                    numero:
+                      type: string
+                    celular:
+                      type: boolean
+                    autorizador:
+                      type: boolean
+    AuthMeSuccessResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Identificador do usuário ou da aplicação
+        name:
+          type: string
+          description: Nome do usuário ou da aplicação
+        email:
+          type: string
+          description: Email do usuário
+        organization:
+          type: string
+          description: Organização a qual o usuário pertence
+        userAccountInfo:
+          type: object
+          properties:
+            deprecatedDetails:
+              type: boolean
+            deprecatedPassword:
+              type: boolean
+            lastPasswordUpdate:
+              type: string
+            passwordExpirationDate:
+              type: string
+            has2FA:
+              type: boolean
+            twoFactorRequired:
+              type: boolean
+        tokenType:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    ClientInfoSuccessResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Identificador do usuário ou da aplicação
+        name:
+          type: string
+          description: Nome do usuário ou da aplicação
+        email:
+          type: string
+          description: Email do usuário
+        organization:
+          type: string
+          description: Organização a qual o usuário pertence
+        userAccountInfo:
+          type: object
+          properties:
+            deprecatedDetails:
+              type: boolean
+            deprecatedPassword:
+              type: boolean
+            lastPasswordUpdate:
+              type: string
+            passwordExpirationDate:
+              type: string
+            has2FA:
+              type: boolean
+            twoFactorRequired:
+              type: boolean
+        token:
+          type: string
+          description: Token Jwt.
+        tokenType:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    AppCredentilasSuccessResponse:
+      type: object
+      properties:
+        client:
+          type: object
+          properties:
+            title:
+              type: string
+              description: Nome da aplicação
+            appKey:
+              type: string
+              description: Chave da aplicação
+            acronym:
+              type: string
+            id:
+              type: integer
+              format: int32
+        token:
+          type: string
+        tokenType:
+          type: string
+        roles:
+          type: array
+          items:
+            type: object
+    SessionCredentialsSuccessResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token de permissões
+        redirect:
+          type: string
+    AuthBodyResponse:
+      type: object
+      properties:
+        client:
+          $ref: '#/components/schemas/ClientInfoSuccessResponse'
+    ApiErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        details:
+          type: string
+        message:
+          type: string
+        errorCode:
+          type: integer
+          format: int32
+    DigitalCertResponse:
+      type: object
+      properties:
+        token:
+          type: string
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://petstore.swagger.io/oauth/dialog
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
