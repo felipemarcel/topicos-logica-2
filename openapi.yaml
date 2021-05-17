@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Acesso cidadão
+  title: Acesso Cidadão
   description: API para consumo de informações relacionadas aos cidadãos, organizaçõese
     e serviços do governo do estado do Ceará
   contact:
@@ -600,6 +600,99 @@ paths:
                 details: Email informado não é válido 
                 message: Email informado não é válido
   
+  /users/{userID}/access:
+    get:
+      tags:
+      - Home
+      summary: Retorno dos dados Pessoal cadastrados do usuário 
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Informações da atualização do perfil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessDate'
+              example:
+                - active: true
+                  application:
+                    title: ACESSO CIDADÃO
+                    description: Aplicação responsável pela gestão de usuários e controle de acesso global das Plataforma Big Data do Governo do Estado do Ceará.
+                    redirectUrl: 'http://50.17.69.232:3000/home'
+                    appKey: 80c93ebdf57d3836da3086d3d0a998ee
+                    acronym: ACD
+                    enabled: true
+                
+  
+  /user-details/both/enriched/sinesp-id/{userID}:
+    get:
+      tags:
+      - Perfil Pessoal
+      summary: Retorno dos dados Pessoal cadastrados do usuário 
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Informações da atualização do perfil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalProfile_Get'
+              example:
+                id: 4
+                userId: 05750019330
+                email: ulissesjapp@gmail.com
+                name: Ulisses Queiroz
+                socialName: Ulisses Queiroz
+                birth:
+                  date: '1994-08-01'
+                  countryId: 1
+                  cityId: 996
+                  stateId: 1
+                sexId: 1
+                skinColorId: 3
+                maritalStatusId: 2
+                bloodTypeId: 1
+                rhFactorId: 2
+                organDonor: false
+                nationalityTypeId: 1
+                nationalityCountryId: 1
+                firstAffiliation:
+                  name: Maria Teste
+                  sexId: 2
+                secondAffiliation:
+                  name: João Teste
+                  sexId: 1
+                deficient: true
+                image: Imagem codificada em formato base64 com tipo string
+  
   /user-details/personal{userID}:
     patch:
       tags:
@@ -626,7 +719,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PersonalProfile'
+                $ref: '#/components/schemas/PersonalProfile_Patch'
               example:
                 birth:
                   cityId: 996
@@ -641,7 +734,7 @@ paths:
                   sexId: 2
                 genderIdentity: 0
                 id: 4
-                image: "data:image/jpeg;base64,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"
+                image: Imagem codificada em formato base64 com tipo string
                 maritalStatusId: 2
                 name: "Ulisses Queiroz"
                 nationalityCountryId: 1
@@ -652,7 +745,7 @@ paths:
                   name: "João Sicrano"
                   sexId: 1
                 sexId: 1
-                sinespId: "05750019330"
+                userId: "05750019330"
                 skinColorId: 1
                 socialName: "Ulisses Queiroz"
   
@@ -885,6 +978,66 @@ paths:
                  - id: 2
                    label: Mulher Trans
   
+  /user-details/documents/{userID}isValid=true:
+    get:
+      tags:
+      - Perfil Documentação
+      summary: Retorno dos dados Documentação cadastrados do usuário 
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: isValid
+          description: Parametro padrão usado no fluxo, possibilidade de ser removido em ajustes futuros
+          schema:
+            type: boolean
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Informações da atualização do perfil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentationProfile_Get'
+              example:
+                id: 3
+                userId: 05750019330
+                voterRegistration: 4636 5660 0710
+                voterSection: '72'
+                voterZone: '004'
+                voterUfId: 1
+                rg: '20073628454'
+                rgIssueInstitution: ssp
+                rgStateId: 1
+                rgIssueDate: '2009-09-10'
+                cnh: '91904831404'
+                cnhCategoryId: 2
+                cnhIssueLocation: Detran
+                cnhIssueDate: '2021-05-11'
+                cnhExpirationDate: '2024-08-08'
+                cnhUfId: 1
+                visaTypeId: 2
+                visaExpirationDate: '2021-05-11'
+                passport:
+                  number: 0090909087070778
+                  issueDate: '2020-04-13'
+                  serialNumber: '897789'
+                  expirationDate: '2023-05-06'
+                  country: 1
+                
+      
   /user-details/documents/{userID}:
     patch:
       tags:
@@ -911,7 +1064,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DocumentationProfile'
+                $ref: '#/components/schemas/DocumentationProfile_Patch'
               example:
                 cnh: "32715195100"
                 cnhCategoryId: 2
@@ -930,7 +1083,7 @@ paths:
                 rgIssueDate: "2009-09-10"
                 rgIssueInstitution: "ssp"
                 rgStateId: 1
-                sinespId: "05750019330"
+                userId: "05750019330"
                 visaExpirationDate: "2021-05-11"
                 visaTypeId: 2
                 voterRegistration: "8122 2027 0175"
@@ -1029,6 +1182,58 @@ paths:
                 - id: 11
                   label: Visto de Visita por meio eletrônico
                 
+  
+  /user-details/communication/{userID}isValid=true:
+    get:
+      tags:
+      - Perfil Comunicação
+      summary: Retorno dos dados Comunicação cadastrados do usuário 
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: isValid
+          description: Parametro padrão usado no fluxo, possibilidade de ser removido em ajustes futuros
+          schema:
+            type: boolean
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Informações da atualização do perfil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationProfile'
+              example:  
+                id: 4
+                userId: 05750019330
+                address: Rua José Pinheiro Pessoa
+                addressNumber: '91'
+                addressComplement: Próximo a escola Salaberga
+                district: Outra Banda
+                zipCode: '61942345'
+                countryId: 1
+                addressStateId: 1
+                addressCityId: 996
+                userPhones:
+                  - id: 41
+                    userDetailsId: 4
+                    number: '85997251959'
+                    phoneTypeId: 1
+                    authorize: true
+                    countryCode: 55
                 
   /user-details/communication/{userID}:
     patch:
@@ -1059,7 +1264,7 @@ paths:
                 $ref: '#/components/schemas/CommunicationProfile'
               example:
                id: 4
-               sinespId: 05750019330
+               userId: 05750019330
                address: Rua José Pinheiro Pessoa
                addressNumber: '91'
                district: Outra Banda
@@ -1106,7 +1311,7 @@ paths:
     get:
       tags:
       - Perfil Comunicação
-      summary: Endpoint usado para recuperar estados de emissão do RG cadastrados no sistema
+      summary: Endpoint usado para recuperar estados cadastrados no sistema
       operationId: EditarEstadoDocumentaçãoRG
       parameters:
       - in: header
@@ -1120,11 +1325,11 @@ paths:
         required: true
       responses:
         200:
-          description: Retorno dos estados onde podem ser emitidos RG
+          description: Retorno dos estados
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EstadoRG'
+                $ref: '#/components/schemas/PerfilEstado'
               example:
                 - id: 3
                   name: Acre
@@ -1296,31 +1501,91 @@ paths:
                   ibgeId: 12908
                   stateId: 1
   
-  /patents:
+  /user-details/professional/{userID}isValid=true:
     get:
       tags:
         - Perfil Profissional
-      summary: Recuperar as patentes cadastradas no sistema
-      operationId: EditarPatente
+      summary: Retorno dos dados profissionais do usuário
       parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: isValid
+          description: Parametro padrão usado no fluxo, possibilidade de ser removido em ajustes futuros
+          schema:
+            type: boolean
+          required: true
         - in: header
           name: Header
           description: Token access enviado no header da requisição
           schema:
-            type: object
-            example:
-              Authorization: >-
-                eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o
-              Accept-Client: 80c93ebdf57d3836da3086d3d0a998ee
-          required: false
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
       responses:
         200:
-          description: Retorno dos tipos de patentes cadastradas
+          description: Informações da atualização do perfil profissional
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PerfilPatente'
-              example: ainda não há patentes cadastradas
+                $ref: '#/components/schemas/DocumentationProfessionalPatch'
+              example:
+                id: 2
+                userId: 07695430307
+                organizationId: 1
+                inssDeclarationType: 1
+                originOrganizationId: 1
+                functionalName: Analista de sistemas
+                functionalRegistrationNumber: '1212223'
+                entryDate: '2021-05-12'
+                role: Desenvolvedor
+                function: Testes e Manutenção
+                allocationUnity: Centro
+  
+  /user-details/professional/{userID}:
+    patch:
+      tags:
+      - Perfil Profissional
+      summary: Entrada de dados para atualizar informações profissionais
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee" 
+      responses:
+        200:
+          description: Informações da atualização do perfil profissional 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentationProfessionalPatch'
+              example:
+                  id: 2
+                  userId: 07695430307
+                  organizationId: 1
+                  inssDeclarationType: 1
+                  originOrganizationId: 1
+                  functionalName: Analista de sistemas
+                  functionalRegistrationNumber: '1212223'
+                  entryDate: '2021-05-12'
+                  role: Desenvolvedor
+                  function: Testes e Manutenção
+                  allocationUnity: Centro
   
   /inss-declarations:
     get:
@@ -1369,16 +1634,19 @@ paths:
           name: page
           schema:
             type: integer
+          description: Atributo que controla a página
           required: true
         - in: query
           name: parentId
           schema:
             type: integer
+          description: Id do objeto pai na hierarquia de unidades organizacionais
           required: false
         - in: query
           name: size
           schema:
             type: integer
+          description: Ajusta o tamanho do retorno
           required: true
       responses:
         200:
@@ -1408,12 +1676,106 @@ paths:
                 acronym: MUN
                 path:
                   - 4
+  /user-details/financial/{userID}isValid=true:
+    get:
+      tags:
+        - Perfil Informações Adicionais
+      summary: Retorno dos dados adicionais do usuário
+      parameters:        
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: isValid
+          description: Parametro padrão usado no fluxo, possibilidade de ser removido em ajustes futuros
+          schema:
+            type: boolean
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Informações da atualização do perfil de informações adicionais
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentationFinancialPatch'
+              example:
+                id: 2
+                userId: 07695430307
+                bankId: 1
+                bankAgency: '1223'
+                bankAccount: '212221'
+                bankAccountTypeId: 1
+                rne: a
+                rneClassificationId: 1
+                rneIssueDate: '2021-05-12'
+                incomeDate: '2021-05-12'
+  
+  /user-details/financial/{userID}:
+    patch:
+      tags:
+      - Perfil Informações Adicionais
+      summary: Entrada de dados para atualizar informações adicionais
+      parameters:
+        - in: path
+          name: userID
+          description: Cpf do usuário
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee" 
+      responses:
+        200:
+          description: Informações da atualização do perfil de informações adicionais 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentationFinancialPatch'
+              example:
+                id: 2
+                userId: 07695430307
+                bankId: 1
+                bankAgency: '1223'
+                bankAccount: '212221'
+                bankAccountTypeId: 1
+                rne: V232865-S
+                rneClassificationId: 1
+                rneIssueDate: '2021-05-12'
+                incomeDate: '2021-05-12'
+  
   /bank:
     get:
       tags:
         - Perfil Informações Adicionais
       summary: Endpoint para recuperar os bancos cadastrados no sistema
       operationId: EditarBanco
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
       responses:
         200:
           description: Retorno dos bancos cadastrados
@@ -1422,7 +1784,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PerfilBanco'
               example:
-                Ainda não há bancos cadastrados
+                - id: 1
+                  code: 1
+                  name: Banco do Brasil S.A.
+                  nameReduced: Banco do Brasil S.A.
+                - id: 2
+                  code: 3
+                  name: Banco da Amazônia S.A.
+                  nameReduced: Banco da Amazônia S.A.
                 
   /bank-accounts:
     get:
@@ -1430,6 +1799,16 @@ paths:
         - Perfil Informações Adicionais
       summary: Recuperar os tipos de conta de banco cadastradas no sistema
       operationId: EditarTipoConta
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
       responses:
         200:
           description: Retorno dos tipos de conta de banco
@@ -1451,6 +1830,16 @@ paths:
         - Perfil Informações Adicionais
       summary: Recuperar o tipo de Registro Nacional Migratório
       operationId: EditarRneClassification
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
       responses:
         200:
           description: Retorno dos tipos de classificação do Registro Nacional Migratório
@@ -1463,9 +1852,1282 @@ paths:
                   label: Temporário
                 - id: 2
                   label: Permanente
+                
+  /academic-formations:
+    get:
+      tags:
+        - Perfil Formação
+      summary: Recuperar os tipos de formações cadastradas
+      operationId: EditarTipoDeFormacao
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos tipos de formação
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicFormations'
+              example:
+                - id: 1
+                  label: Ensino Médio
+                - id: 2
+                  label: Ensino Técnico
+                - id: 3
+                  label: Graduação
+                - id: 4
+                  label: Especialização
+                - id: 5
+                  label: Pós-Graduação (lato sensu)
+                - id: 6
+                  label: Mestrado
+                - id: 7
+                  label: Doutorado
+                - id: 8
+                  label: Formação Inicial e Continuada (FIC)
+                - id: 9
+                  label: Formação Profissional/Curso de Pequena Duração
+                
+  
+  /study-areas:
+    get:
+      tags:
+        - Perfil Formação
+      summary: Recuperar as áreas de estudo cadastradas
+      operationId: EditarAreasDeEstudo
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno das áreas de estudo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudyAreas'
+                
+  /courses-modalities:
+    get:
+      tags:
+        - Perfil Formação
+      summary: Recuperar as áreas de estudo cadastradas
+      operationId: EditarModalidadeDeEnsino
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno das modalidades de ensino
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoursesModalities'
+              example:
+                - id: 1
+                  label: Presencial
+                - id: 2
+                  label: Semipresencial
+                - id: 3
+                  label: Educação a Distância - EAD
+                
+  /languages:
+    get:
+      tags:
+        - Perfil Formação
+      summary: Recuperar as áreas de estudo cadastradas
+      operationId: EditarIdioma
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno dos idiomas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Languages'
+              
+  /proficiency-ratings:
+    get:
+      tags:
+        - Perfil Formação
+      summary: Recuperar as áreas de estudo cadastradas
+      operationId: EditarProeficiência
+      parameters:
+      - in: header
+        name: Header
+        description: Token access enviado no header da requisição
+        schema:
+          $ref: '#/components/schemas/Me'
+        example:
+          Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+          Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"  
+        required: true
+      responses:
+        200:
+          description: Retorno das modalidades de ensino
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProficiencyRatings'
+              example:
+                - id: 1
+                  label: Péssimo
+                  description: ''
+                - id: 2
+                  label: Ruim
+                  description: ''
+                - id: 3
+                  label: Regular
+                  description: ''
+                - id: 4
+                  label: Bom
+                  description: ''
+                - id: 5
+                  label: Muito Bom
+                  description: ''
+                - id: 6
+                  label: Excelente
+                  description: ''
+  
+  /organizations:
+    post:  
+      tags:
+       - Estrutura Organizacionais
+      summary: Endpoint de retorno das estruturas organizacionais cadastradas
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Esferas organizacionais cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationalStructures'
+              example:
+        400:
+          description: Erro apresentado quando um usuário ou aplicação estão desabilitados, ou usuário não tem permissões
+          content:
+            ApiErrorResponse:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                ArquivoNãoEnviado:
+                  value:
+                    message: Arquivo não enviado.
+                    status: 400
+                    details: null
+                    errorCode: null
+                
+          
+              
+  /organizations/roots:
+    get:
+      tags:
+       - Estrutura Organizacionais
+      summary: Endpoint de retorno das estruturas organizacionais cadastradas
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Esferas organizacionais cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationalStructures'
+              example:
+                - title: ESFERA MUNICIPAL
+                  acronym: MUN
+                  cnpj: null
+                  registryCode: null
+                  documentInfo: {}
+                  organizationClassifications: []
+                  organizationTypeId: 1
+                  specializationTypes: []
+                  orgCepInfo:
+                    countryId: 1
+                  regionId: null
+                  organizationAddress: {}
+                  organizationComplement: {}
+                  path:
+                    - 4
+                  enabled: true
+                  id: 4
+                  createDate: '2021-04-27T09:20:01-03:00'
+                  lastUpdate: '2021-04-27T09:20:01-03:00'
+                  parentId: null
+                  image: null
+                  emails: []
+                  phones: []
+                  userCount: 0
+                  externalIdSeo: null
+                  externalIsLotacao: null
+                - title: ESFERA FEDERAL
+                  acronym: FED
+                  cnpj: null
+                  registryCode: null
+                  documentInfo: {}
+                  organizationClassifications: []
+                  organizationTypeId: 1
+                  specializationTypes: []
+                  orgCepInfo:
+                    countryId: 1
+                  regionId: null
+                  organizationAddress: {}
+                  organizationComplement: {}
+                  path:
+                    - 2
+                  enabled: true
+                  id: 2
+                  createDate: '2021-04-27T09:20:01-03:00'
+                  lastUpdate: '2021-04-27T09:20:01-03:00'
+                  parentId: null
+                  image: null
+                  emails: []
+                  phones: []
+                  userCount: 0
+                  externalIdSeo: null
+                  externalIsLotacao: null
+                - title: ESFERA ESTADUAL
+                  acronym: EST
+                  cnpj: null
+                  registryCode: null
+                  documentInfo: {}
+                  organizationClassifications: []
+                  organizationTypeId: 1
+                  specializationTypes: []
+                  orgCepInfo:
+                    countryId: 1
+                  regionId: null
+                  organizationAddress: {}
+                  organizationComplement: {}
+                  path:
+                    - 3
+                  enabled: true
+                  id: 3
+                  createDate: '2021-04-27T09:20:01-03:00'
+                  lastUpdate: '2021-04-27T09:20:01-03:00'
+                  parentId: null
+                  image: null
+                  emails: []
+                  phones: []
+                  userCount: 0
+                  externalIdSeo: null
+                  externalIsLotacao: null
+                - title: ESFERA INTERNACIONAL
+                  acronym: INT
+                  cnpj: null
+                  registryCode: null
+                  documentInfo: {}
+                  organizationClassifications: []
+                  organizationTypeId: 1
+                  specializationTypes: []
+                  orgCepInfo:
+                    countryId: 1
+                  regionId: null
+                  organizationAddress: {}
+                  organizationComplement: {}
+                  path:
+                    - 5
+                  enabled: true
+                  id: 5
+                  createDate: '2021-04-27T09:20:07-03:00'
+                  lastUpdate: '2021-04-27T09:20:07-03:00'
+                  parentId: null
+                  image: null
+                  emails: []
+                  phones: []
+                  userCount: 0
+                  externalIdSeo: null
+                  externalIsLotacao: null
+  
+  /organizations/{parentId}/children:             
+    get:
+      tags:
+        - Estrutura Organizacionais
+      summary: Endpoint onde retorna a organização cadastrada
+      parameters:
+        - in: path
+          name: parentId
+          description: ID de relação coma a esfera
+          schema:
+            type: integer
+          required: true
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: query
+          name: page
+          description: Filtro de busca para organizações cadastradas 
+          schema:
+            type: integer
+            format: num32
+        - in: query
+          name: size
+          description: Filtro de busca para organizações cadastradas 
+          schema:
+            type: integer
+            format: num32
+      responses:
+        200:
+          description: Organização cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationalStructures'
+              example:
+                - title: Cidadão Brasileiro
+                  acronym: CID
+                  cnpj: null
+                  registryCode: null
+                  documentInfo: {}
+                  organizationClassifications: []
+                  organizationTypeId: 1
+                  specializationTypes: []
+                  orgCepInfo:
+                    countryId: 1
+                  regionId: null
+                  organizationAddress: {}
+                  organizationComplement: {}
+                  path:
+                    - 2
+                    - 1
+                  enabled: true
+                  id: 1
+                  createDate: '2021-04-27T09:19:59-03:00'
+                  lastUpdate: '2021-04-27T09:19:59-03:00'
+                  parentId: 2
+                  image: null
+                  emails: []
+                  phones: []
+                  userCount: 31
+                  externalIdSeo: null
+                  externalIsLotacao: null
+  
+  /organizations-types:
+    get:
+      tags:
+        - Estrutura Organizacionais
+      summary: Endpoint onde retorna tipo de organização
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Organização cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationalType'
+              example:
+                - label: Orgão Independente
+                  id: 1
+                - label: Orgão Dependente
+                  id: 2
+  
+  /organizations-classifications:
+    get:
+      tags:
+        - Estrutura Organizacionais
+      summary: Endpoint onde retorna a classificação da organização
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Organização cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationalClassifications'
+              example:
+                - description: ''
+                  label: Classificação Teste
+                  id: 1
+                
+                
+  /organizations-specializations:
+    get:
+      tags:
+        - Estrutura Organizacionais
+      summary: Endpoint onde retorna a especialização da organização
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Organização cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationalClassifications'
+              example:
+                - description: ''
+                  label: Classificação Teste
+                  id: 1
+                
+              
+  /applications:
+    get:
+      tags:
+        - Aplicação
+      summary: Endpoint onde retorna as aplicações cadastradas
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: query
+          name: search
+          description: Filtro de busca para aplicações cadastradas 
+          schema:
+            type: string
+      responses:
+        200:
+          description: Aplicações cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredApplications'
+              example:
+                - id: 3
+                  clientId: 34
+                  title: INTEGRASOCIAL
+                  description: Sistema de visões analíticas para informações da secretaria social
+                  appKey: 4a9682ec97638ce118f558cae1c872cb
+                  acronym: INTS
+                  redirectUrl: 'http://54.232.25.185/big-data-social/'
+                  enabled: true
+                  hasSecret: true
+                  allowedTokens: 1
+                - id: 1
+                  clientId: 1
+                  title: ACESSO CIDADÃO
+                  description: Aplicação responsável pela gestão de usuários e controle de acesso global das Plataforma Big Data do Governo do Estado do Ceará.
+                  appKey: 80c93ebdf57d3836da3086d3d0a998ee
+                  acronym: ACD
+                  redirectUrl: 'http://50.17.69.232:3000/home'
+                  enabled: true
+                  hasSecret: false
+                  allowedTokens: 1
+    post:
+      tags:
+        - Aplicação
+      summary: Cadastro de uma nova Aplicação
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Aplicação cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredApplications'
+              example:
+                id: 4
+                clientId: 42
+                title: APLICAÇÃO TESTE
+                description: Testee de cadastro para aplicações
+                appKey: 02545692bd900f771de7fee38380194a
+                acronym: APPTT
+                redirectUrl: 'http://localhost:3000/applications/teste'
+                enabled: true
+                hasSecret: false
+                allowedTokens: 1
+  
+  /{appKey}/access-profiles:
+    get:
+      tags:
+        - Aplicação
+      summary: Endpoint onde retorna os perfis cadastradas
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: appKey
+          description: Chave de identificação da aplicação
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Aplicação cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessProfiles'
+              example:
+                id: 2
+                appId: 4
+                name: TESTE DO PERFIL
+                permissions:
+                  - 25
+                description: 'Perfil feito para testar cadastro '
+                createDate: '2021-05-13T17:19:36-03:00'
+                lastUpdate: '2021-05-13T17:19:36-03:00'
+    post:
+      tags:
+        - Aplicação
+      summary: Cadastro de perfil na aplicação
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: appKey
+          description: Chave de identificação da aplicação
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Aplicação cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessProfiles'
+              example:
+                id: 2
+                appId: 4
+                name: TESTE DO PERFIL
+                permissions:
+                  - 25
+                description: 'Perfil feito para testar cadastro '
+                createDate: '2021-05-13T17:19:36-03:00'
+                lastUpdate: '2021-05-13T17:19:36-03:00'
+  
+  /applications/{appId}/secret:
+    patch:
+      tags:
+        - Aplicação
+      summary: Requisição de uma chave privada
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: appId
+          description: id de identificação da aplicação
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Aplicação cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretKey' 
+              example:
+                secret: "143CAF6C4F78A34AF54E8689F3D41"
+  
+  /document-types:
+    get:
+      tags:
+        - Aplicação
+      summary: Tipos de documentos cadastrados
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Documentação cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentType' 
+  
+  /applications/{appId}/docs:
+    get:
+      tags:
+        - Aplicação
+      summary: Retorno de documentos cadastrados
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: appId
+          description: Id de identificação da aplicação
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Aplicação cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentType'     
+  
+  /users:
+    get:
+      tags:
+      - Usuários
+      summary: Endpoint que retorna os usuários cadastrados no sistema
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Atributo que controla a página
+        - in: query
+          name: size
+          schema:
+            type: integer
+          description: Ajusta o tamanho do retorno
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: String do campo de busca por usuário
+      responses:
+        200:
+          description: Lista de usuários cadastrados no sistema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaUsuarios'
+              example:
+                - userId: '01445021358'
+                  name: Felipe
+                  email: felipe.marcel@insightlab.ufc.br
+                  organizationAcronym: CID
+                  organizationTitle: Cidadão Brasileiro
+                  enabled: true
+                  firstAccess: false
+                - userId: '27674395000164'
+                  name: BRENA KESSIA SILVA DOS SANTOS
+                  email: vinibern5@gmail.com
+                  organizationAcronym: CID
+                  organizationTitle: Cidadão Brasileiro
+                  enabled: true
+                  firstAccess: false
+                  image: Imagem codificada em formato base64 com tipo string
+  
+  /users/{userID}:
+    get:
+      tags:
+        - Usuários
+      summary: Endpoint que retorna as informações de usuário um específico
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: userID
+          schema:
+            type: integer
+          required: true
+          description: CPF do usuário
+      responses:
+        200:
+          description: Informações do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaUsuarioEspecifico'
+              example:
+                userId: 07695430307
+                name: Carlos Ferreira
+                email: carlosferreirahd@gmail.com
+                enabled: true
+                firstAccess: false
+                organizationId: 1
+                image: 'data:image/jpg;base64,'
+    delete:
+      tags:
+        - Usuários
+      summary: Endpoint que deleta um usuário do sistema
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: userID
+          schema:
+            type: integer
+          required: true
+          description: CPF do usuário
+      responses:
+        200:
+          description: Retorna se o usuário foi deletado com sucesso
+          content:
+            boolean:
+              schema:
+                $ref: '#/components/schemas/PaginaDeletarUsuario'
+              example:
+                true
+  /roles:
+    post:
+      tags:
+        - Permissões Gerais
+      summary: Endpoint para a criação de uma nova permissão
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      requestBody:
+        $ref: '#/components/requestBodies/NewRoleRequestBody'
+      responses:
+        201:
+          description: Retorno da nova permissão criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permissao'
+              example:
+                id: 26
+                title: ROLE_PLATFORM_ROLE_TESTE
+                description: PERMISSÃO DE TESTE
+                type: basic
+                disabled: true
+                twoFactorRequired: false
+                
+  /roles/{id}:
+    put:
+      tags:
+        - Permissões Gerais
+      summary: Endpoint para a edição de uma permissão
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Id da permissão
+      requestBody:
+        $ref: '#/components/requestBodies/EditRoleRequestBody'
+      responses:
+        200:
+          description: Permissão com os dados editados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permissao'
+              example:
+                id: 27
+                title: ROLE_PLATFORM_ADMIN
+                description: PERMISSÃO DE ADMIN
+                type: basic
+                disabled: true
+                twoFactorRequired: false
+    delete:
+      tags:
+        - Permissões Gerais
+      summary: Endpoint para a remoção de uma permissão
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Id da permissão
+      responses:
+        200:
+          description: Retorna se a permissão foi deletada com sucesso
+          content:
+            boolean:
+              schema:
+                $ref: '#/components/schemas/DeletarPermissao'
+              example:
+                true
+                
+  /roles/platform:
+    get:
+      tags:
+        - Permissões Gerais
+      summary: Endpoint que retorna todas as permissões do sistema
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Lista com todas as permissões do sistema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodasAsPermissoes'
+              example:
+                - id: 27
+                  title: ROLE_PLATFORM_ADMIN
+                  description: PERMISSÃO DE ADMINISTRADOR
+                  type: basic
+                  disabled: true
+                  twoFactorRequired: false
+                - id: 26
+                  title: ROLE_PLATFORM_ROLE_TESTE
+                  description: PERMISSÃO DE TESTE
+                  type: basic
+                  disabled: true
+                  twoFactorRequired: false
+  
 components:
+  requestBodies:
+    NewRoleRequestBody:
+      description: Request Body da criação de nova permissão
+      required: true
+      content:
+        application/json:
+          example:
+            consul: []
+            description: PERMISSÃO DE TESTE
+            disabled: true
+            title: ROLE_PLATFORM_ROLE_TESTE
+            twoFactorRequired: false
+            type: basic
+          schema:
+            type: object
+            properties:
+              consul:
+                type: array
+                items:
+                  type: string
+                  description: Ainda não se sabe
+              description:
+                type: string
+                description: Descrição da nova permissão
+              disabled:
+                type: boolean
+                description: Define se a nova permissão está ativada
+              title:
+                type: string
+                description: Título da nova permissão
+              twoFactorRequired:
+                type: boolean
+                description: Determina se a nova permissão possui obrigatoriedade de autenticação em duas etapas
+              type:
+                type: string
+                description: Tipo da nova permissão
+    EditRoleRequestBody:
+      description: Request Body da edição de permissão
+      required: true
+      content:
+        application/json:
+          example:
+            consul: []
+            description: PERMISSÃO DE ADMIN
+            disabled: true
+            id: 27
+            title: ROLE_PLATFORM_ADMIN
+            twoFactorRequired: false
+            type: basic
+          schema:
+            type: object
+            properties:
+              consul:
+                type: array
+                items:
+                  type: string
+                  description: Ainda não se sabe
+              description:
+                type: string
+                description: Descrição da permissão
+              disabled:
+                type: boolean
+                description: Define se a permissão está ativada
+              id:
+                type: integer
+                description: Id da permissão
+              title:
+                type: string
+                description: Título da permissão
+              twoFactorRequired:
+                type: boolean
+                description: Determina se a permissão possui obrigatoriedade de autenticação em duas etapas
+              type:
+                type: string
+                description: Tipo da permissão
+                
   schemas:
-    PersonalProfile:
+    AccessDate:
+      type: array
+      items:
+        type: object
+        properties:
+          active:
+            type: boolean
+            description: Se ativou ou não ana aplicação
+          application:
+            type: object
+            properties:
+              title:
+                type: string
+                description: Nome da aplicação
+              description:
+                type: string
+                description: Descrição da aplicação
+              redirectUrl:
+                type: string
+                description: Url de redirecionamento
+              appKey:
+                type: string
+                description: Cahve da aplicação
+              acronym:
+                type: string
+              enabled:
+                type: boolean
+                description: Status de ativo ou não
+    OrganizationalStructures:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+            description: Título da esfera que a organização pertence
+          acronym:
+            type: string
+            description: Iniciais da esfera
+          cnpj:
+            type: string
+            description: Cnpj da organização
+          registryCode:
+            type: string
+            description: Códigod e registro
+          documentInfo:
+            type: object
+            description: Docuemntos para informações
+          organizationClassifications:
+            type: array
+            items:
+              type: object
+            description: Calssificação das organizações
+          organizationTypeId:
+            type: integer
+            format: num32
+            description: ID de identificação do tipo de organização
+          specializationTypes:
+            type: array
+            items:
+              type: object
+            description: Tipos de especializações para as organizações
+          orgCepInfo:
+            type: object
+            properties:
+              countryId:
+                type: integer
+                format: num32
+                description: ID da país
+          regionId:
+            type: integer
+            format: num32
+            description: ID da região
+          organizationAddress:
+            type: object
+            description: Endereço da organização
+          organizationComplement:
+            type: object
+            description: Complemento do endereço da organização
+          path:
+            type: array
+            items:
+              type: object
+          enabled:
+            type: boolean
+            description: Organização ativa ou não
+          id:
+            type: integer
+            format: num32
+            description: Identificador da esfera
+          createDate:
+            type: string
+            description: Data de criação
+          lastUpdate:
+            type: string
+            description: Data de atualização
+          parentId:
+            type: integer
+            format: num32
+          image:
+            type: string
+            description: Imagem de perfil
+          emails:
+            type: array
+            items:
+              type: string
+            description: Emails cadastrados
+          phones:
+            type: array
+            items:
+              type: string
+            description: Números cadastrados
+          userCount:
+            type: integer
+            format: num32
+          externalIdSeo:
+            type: string
+          externalIsLotacao:
+            type: string
+    OrganizationalType:
+      type: array
+      items:
+        type: object
+        properties:
+          label:
+            type: string
+            description: Descrição do tipo de orgão
+          id:
+            type: integer
+            format: num32
+            description: ID que identifica o tupo de orgão
+    OrganizationalClassifications:
+      type: array
+      items:
+        type: object
+        properties:
+          description:
+            type: string
+          label:
+            type: string
+          id:
+            type: integer
+            format: num32
+    PersonalProfile_Get:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: num32
+          description: ID usado para relacionamentos no banco de dados
+        userId:
+          type: string
+          description: Identificador do usuário
+        organizationId:
+          type: integer
+          format: num32
+          description: Identifica a organização
+        name:
+          type: string
+          description: Nome do usuário
+        email:
+          type: string
+          description: Email cadastrado do usuário
+        birth:
+          type: object
+          properties:
+            date:
+              type: string
+              description: Data de nascimento
+            countryId:
+              type: integer
+              format: num32
+              description: Código da país
+            cityId:
+              type: integer
+              format: num32
+              description: Código da cidade
+            stateId:
+              type: integer
+              format: num32
+              description: Código do estado
+        sexId:
+          type: integer
+          format: num32
+          description: Id que identififca o sexo do usuário
+        skinColorId:
+          type: integer
+          format: num32
+          description: Id que identifica o tom de pele do usuário
+        maritalStatusId:
+          type: integer
+          format: num32
+          description: Id que identifica o estado civil
+        bloodTypeId:
+          type: integer
+          format: num32
+          description: Id do tipo sanguíneo
+        rhFactorId:
+          type: integer
+          format: num32
+          description: Id que identifica o fator RH sanguíneo
+        organDonor:
+          type: boolean
+          description: Identifica se o usuário é doador de orgãos
+        nationalityTypeId:
+          type: integer
+          format: num32
+          description: Id que identifica o tipo de nacionalidade
+        nationalityCountryId:
+          type: integer
+          format: num32
+          description: Id que identifica país da nacionalidade
+        firstAffiliation:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nome da Filiação
+            sexId:
+              type: integer
+              format: num32
+              description: Id do sexo da filiação
+        secondAffiliation:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nome da Filiação
+            sexId:
+              type: integer
+              format: num32
+              description: Id do sexo da filiação
+        deficient:
+          type: boolean
+          description: Confirmação de deficiência
+        image:
+          type: string
+          description: Foto escolhida pelo usuário para o perfil
+    PersonalProfile_Patch:
       type: object
       properties:
         birth:
@@ -1553,7 +3215,7 @@ components:
           type: integer
           format: num32
           description: Id que identififca o sexo do usuário
-        sinespId:
+        userId:
           type: string
           description: Cpf do usuário que é usado como identificador
         skinColorId:
@@ -1671,7 +3333,7 @@ components:
           label:
             type: string
             description: descreve o tipo de visto
-    EstadoRG:
+    PerfilEstado:
       type: array
       items:
         type: object
@@ -1726,7 +3388,89 @@ components:
           name:
             type: string
             description: Nome do país
-    DocumentationProfile:
+    DocumentationProfile_Get:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: num32
+          description: ID de identificação no banco de dados para relacionamentos entre tabelas
+        userId:
+          type: string
+          description: Identificador do usuário
+        voterRegistration:
+          type: string
+          description: Titulo de eleitor do usuário
+        voterSection:
+          type: string
+          description: Seção de votação
+        voterZone:
+          type: string
+          description: Zona de votação
+        voterUfId:
+          type: integer
+          format: num32
+          description: ID que identifica estado de votação do usuário
+        rg:
+          type: string
+          description: Registro Geral do usuário
+        rgIssueInstitution:
+          type: string
+          description: Local de emissão do RG
+        rgStateId:
+          type: integer
+          format: num32
+          description: ID do estado de emissão do RG
+        rgIssueDate:
+          type: string
+          description: Data de emissão do RG
+        cnh:
+          type: string
+          description: Carteira nacional de habilitação do usuário
+        cnhCategoryId:
+          type: integer
+          format: num32
+          description: ID que identifica a categoria da cnh
+        cnhIssueLocation:
+          type: string
+          description: Local da emissão da cnh
+        cnhIssueDate:
+          type: string
+          description: Data de emissão da cnh
+        cnhExpirationDate:
+          type: string
+          description: data de vencimento da cnh
+        cnhUfId:
+          type: integer
+          format: num32
+          description: ID que identifica o estado de emissão da cnh
+        visaTypeId:
+          type: integer
+          format: num32
+          description: ID que identifica tipo de visto
+        visaExpirationDate:
+          type: string
+          description: data de vencimento do visto
+        passport:
+          type: object
+          properties:
+            number:
+              type: string
+              description: Número do passaporte
+            issueDate:
+              type: string
+              description: Data de emissão do passaporte
+            serialNumber:
+              type: string
+              description: Número de serie do passaporte
+            expirationDate:
+              type: string
+              description: Data ded vencimento do passaporte
+            country:
+              type: integer
+              format: num32
+              description: Id que identifica o país 
+    DocumentationProfile_Patch:
       type: object
       properties:
         cnh:
@@ -1752,6 +3496,7 @@ components:
         id:
           type: integer
           format: num32
+          description: ID de identificação no banco de dados para relacionamentos entre tabelas
         passport:
           type: object
           properties:
@@ -1784,7 +3529,7 @@ components:
           type: integer
           format: num32
           description: Id que identifica estado da emissão do RG
-        sinespId:
+        userId:
           type: string
           description: Identificador do usuário
         visaExpirationDate:
@@ -1814,7 +3559,7 @@ components:
           type: integer
           format: num32
           description: Id que identifica usuário nas tabelas do banco
-        sinespId:
+        userId:
           type: string
           description: Identificador do usuário
         address:
@@ -1823,6 +3568,9 @@ components:
         addressNumber:
           type: string
           description: Número da residência
+        addressComplement:
+          type: string
+          description: Complemento do endereço
         district:
           type: string
           description: Bairro do usuário
@@ -1878,18 +3626,6 @@ components:
           label:
             type: string
             description: Descreve o tipo de declaração
-    PerfilPatente:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            type: integer
-            format: int32
-            description: Id que especifica o tipo de patente
-          label:
-            type: string
-            description: Descreve o tipo de patente
     PerfilOrganizations:
       type: array
       items:
@@ -1914,7 +3650,19 @@ components:
       type: array
       items:
         type: object
-        # ainda não dá pra definir as properties
+        properties:
+          id:
+            type: integer
+            description: Id usado para relacionamentos no banco de dados
+          code:
+            type: integer
+            description: Código do banco no sistema
+          name:
+            type: string
+            description: Nome completo do banco
+          nameReduced:
+            type: string
+            description: Nome reduzido do banco
     PerfilTiposContas:
       type: array
       items:
@@ -1937,6 +3685,308 @@ components:
           label:
             type: string
             description: O tipo de classificação
+    DocumentationProfessionalPatch:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id usado para relacionamentos no banco de dados
+        userId:
+          type: string
+          description: CPF do usuário
+        organizationId:
+          type: integer
+          description: Id que identifica a organização
+        inssDeclarationType:
+          type: integer
+          description: Id que identifica o tipo de declaração de INSS do usuário
+        originOrganizationId:
+          type: integer
+          description: Id que identifica a instituição de origem
+        functionalName:
+          type: string
+          description: Nome funcional do usuário
+        functionalRegistrationNumber:
+          type: string
+          description: Matrícula funcional do usuário
+        entryDate:
+          type: string
+          description: Data de ingresso
+        role:
+          type: string
+          description: Cargo
+        function:
+          type: string
+          description: Função
+        allocationUnity:
+          type: string
+          description: Divisão/Unidade
+    DocumentationFinancialPatch:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id usado para relacionamentos no banco de dados
+        userId:
+          type: string
+          description: CPF do usuário
+        bankId:
+          type: integer
+          description: Id do banco cadastrado no sistema
+        bankAccount:
+          type: string
+          description: Conta do banco do usuário
+        bankAccountTypeId:
+          type: integer
+          description: Id do tipo de conta de banco cadastrado no sistema
+        rne:
+          type: string
+          description: Registro Nacional Migratório do usuário
+        rneClassificationId:
+          type: integer
+          description: Id do tipo de classificação do RNE cadastrado no sistema
+        rneIssueDate:
+          type: string
+          description: Data de expedição do RNE
+        incomeDate:
+          type: string
+          description: Data de entrada do RNE
+    AcademicFormations:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: ID que identifica o tipo de formação
+          label:
+            type: string
+            description: Descrição do tipo de formação
+    StudyAreas:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: ID que identifica a área de estudo
+          label:
+            type: string
+            description: Descrição da área de estudo
+    CoursesModalities:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: ID que identifica a modalidade
+          label:
+            type: string
+            description: Descrição da modalidade
+    Languages:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: ID que identifica o idioma
+          label:
+            type: string
+            description: Descrição do idioma
+    ProficiencyRatings:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: ID que identifica a proeficiência
+          label:
+            type: string
+            description: Descrição da proeficiência
+          description:
+            type: string
+    RegisteredApplications:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: num32
+            description: Id para relacionamento no banco de dados
+          clientId:
+            type: integer
+            format: num32
+            description: Identificador do cliente na aplicação
+          title:
+            type: string
+            description: Título da aplicação
+          description:
+            type: string
+            description: Descrição da aplicação
+          appKey:
+            type: string
+            description: Chave da aplicação para realizar ações dentro do sistema
+          acronym:
+            type: string
+          redirectUrl:
+            type: string
+            description: Url para redirecionar usuário para a aplicação
+          enabled:
+            type: boolean
+            description: Habilitar ou não a aplicação no sistema
+          hasSecret:
+            type: boolean
+          allowedTokens:
+            type: integer
+            format: num32
+    AccessProfiles:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: num32
+          description: Id para relacionamento no banco de dados
+        appId:
+          type: integer
+          format: num32
+          description: Identificador da aplicação
+        name:
+          type: string
+          description: Nome do perfil
+        permissions:
+          type: array
+          items:
+            type: integer
+            format: num32
+            description: Identificador das permissões
+        description:
+          type: string
+          description: Descrição do perfil
+        createDate:
+          type: string
+          description: Data de criação
+        lastUpdate:
+          type: string
+          description: Data da última atualização
+    SecretKey:
+      type: string
+      description: Cheva privada gerada para a aplicação
+    DocumentType:
+      type: array
+      items:
+        type: object
+    PaginaUsuarios:
+      type: array
+      items:
+        type: object
+        properties:
+          userId:
+            type: string
+            description: CPF do usuário
+          name:
+            type: string
+            description: Nome do usuário
+          email:
+            type: string
+            description: Email do usuário
+          organizationAcronym:
+            type: string
+            description: Acrônimo da instituição de origem do usuário
+          organizationTitle:
+            type: string
+            description: Nome da instituição de origem do usuário
+          enabled:
+            type: boolean
+            description: Identifica se o usuário está habilitado
+          firstAccess:
+            type: boolean
+            description: Identifica se é o primeiro acesso do usuário
+          image:
+            type: string
+            description: Base64 da imagem do usuário
+    PaginaUsuarioEspecifico:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: CPF do usuário
+        name:
+          type: string
+          description: Nome do usuário
+        email:
+          type: string
+          description: Email do usuário
+        enabled:
+          type: boolean
+          description: Identifica se o usuário está habilitado
+        firstAccess:
+          type: boolean
+          description: Identifica se é o primeiro acesso do usuário
+        organizationId:
+          type: integer
+          description: Id da unidade organizacional do usuário
+        image:
+          type: string
+          description: Base64 da imagem do usuário
+    PaginaDeletarUsuario:
+      type: boolean
+      description: Retorno se o usuário foi deletado com sucesso
+    Permissao:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id que identifica a permissão
+        title:
+          type: string
+          description: Título da permissão
+        description:
+          type: string
+          description: Descrição da permissão
+        type:
+          type: string
+          description: Tipo da permissão
+        disabled:
+          type: boolean
+          description: Determina se a permissão está ativada
+        twoFactorRequired:
+          type: boolean
+          description: Determina se a permissão possui obrigatoriedade de autenticação em duas etapas
+    TodasAsPermissoes:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Id da permissão
+          title:
+            type: string
+            description: Título da permissão
+          description:
+            type: string
+            description: Descrição da permissão
+          type:
+            type: string
+            description: Tipo da permissão
+          disabled:
+            type: boolean
+            description: Determina se a permissão está ativada
+          twoFactorRequired:
+            type: boolean
+            description: Determina se a permissão possui obrigatoriedade de autenticação em duas etapas
+    DeletarPermissao:
+      type: boolean
+      description: Retorno se a permissão foi deletada com sucesso
     2faValidate:
       type: object
     UserCredentials:
