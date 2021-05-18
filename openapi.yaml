@@ -9,7 +9,6 @@ info:
 servers:
 - url: http://18.212.0.161:9000/api
 paths:
-
   /auth:
     post:
       tags:
@@ -604,7 +603,7 @@ paths:
     get:
       tags:
       - Home
-      summary: Retorno dos dados Pessoal cadastrados do usuário 
+      summary: Retorno das aplicações que o usuário possue
       parameters:
         - in: path
           name: userID
@@ -642,7 +641,7 @@ paths:
     get:
       tags:
       - Perfil Pessoal
-      summary: Retorno dos dados Pessoal cadastrados do usuário 
+      summary: Endpoint para recuperar dados pessoais do usuário 
       parameters:
         - in: path
           name: userID
@@ -697,7 +696,7 @@ paths:
     patch:
       tags:
       - Perfil Pessoal
-      summary: Entrada de dados para atualizar perfil pessoal
+      summary: Endpoint para atualizar dados do perfil pessoal
       parameters:
         - in: path
           name: userID
@@ -753,7 +752,7 @@ paths:
     get:
       tags:
       - Perfil Pessoal
-      summary: Endpoint usado para recuperar sexos cadastrados no sistema
+      summary: Endpoint para recuperar opções de sexos cadastrados no sistema
       operationId: EditarSexo
       parameters:
       - in: header
@@ -783,7 +782,7 @@ paths:
     get:
       tags:
       - Perfil Pessoal
-      summary: Endpoint usado para recuperar fatores RH cadastrados no sistema
+      summary: Endpoint para recuperar opções de fatores RH cadastrados no sistema
       operationId: EditarFatorRH
       parameters:
       - in: header
@@ -812,7 +811,7 @@ paths:
     get:
       tags:
       - Perfil Pessoal
-      summary: Endpoint usado para recuperar tons de pele cadastrados no sistema
+      summary: Endpoint para recuperar opções de tons de pele cadastrados no sistema
       operationId: EditarCorDePele
       parameters:
       - in: header
@@ -847,7 +846,7 @@ paths:
     get:
       tags:
       - Perfil Pessoal
-      summary: Endpoint usado para recuperar tipos sanguíneos cadastrados no sistema
+      summary: Endpoint para recuperar opções sanguíneos cadastrados no sistema
       operationId: EditarTipoSanguineo
       parameters:
       - in: header
@@ -880,7 +879,7 @@ paths:
     get:
       tags:
       - Perfil Pessoal
-      summary: Endpoint usado para recuperar estado civil cadastrado no sistema
+      summary: Endpoint para recuperar opções de estado civil cadastrados no sistema
       operationId: EditarEstadoCivil
       parameters:
       - in: header
@@ -921,7 +920,7 @@ paths:
     get:
       tags:
       - Perfil Pessoal
-      summary: Endpoint usado para recuperar tipo nacionalidade cadastrado no sistema
+      summary: Endpoint para recuperar opções de nacionalidade cadastradas no sistema
       operationId: EditarNacionalidade
       parameters:
       - in: header
@@ -953,7 +952,7 @@ paths:
     get:
       tags:
       - Perfil Pessoal
-      summary: Endpoint usado para recuperar identidade de gênero cadastrado no sistema
+      summary: Endpoint para recuperar opções de identidade de gênero cadastradas no sistema
       operationId: EditarIdentidadeDeGenero
       parameters:
       - in: header
@@ -978,11 +977,11 @@ paths:
                  - id: 2
                    label: Mulher Trans
   
-  /user-details/documents/{userID}isValid=true:
+  /user-details/documents/{userID}:
     get:
       tags:
       - Perfil Documentação
-      summary: Retorno dos dados Documentação cadastrados do usuário 
+      summary: Endpoint para recupera dados de documentação do usuário 
       parameters:
         - in: path
           name: userID
@@ -1036,13 +1035,10 @@ paths:
                   serialNumber: '897789'
                   expirationDate: '2023-05-06'
                   country: 1
-                
-      
-  /user-details/documents/{userID}:
     patch:
       tags:
       - Perfil Documentação
-      summary: Entrada de dados para atualizar documentação
+      summary: Endpoint para atualizar dados da documentação no perfil do usuário
       parameters:
         - in: path
           name: userID
@@ -1094,7 +1090,7 @@ paths:
     get:
       tags:
       - Perfil Documentação
-      summary: Endpoint usado para recuperar categorias de CNH cadastrados no sistema
+      summary: Endpoint para recuperar opções de categorias de CNH cadastrados no sistema
       operationId: EditarCategoriaCNH
       parameters:
       - in: header
@@ -1139,7 +1135,7 @@ paths:
     get:
       tags:
       - Perfil Documentação
-      summary: Endpoint usado para recuperar tipos de vistos cadastrados no sistema
+      summary: Endpoint para recuperar opções dos tipos de vistos cadastrados no sistema
       operationId: EditarTipoVisto
       parameters:
       - in: header
@@ -1183,11 +1179,11 @@ paths:
                   label: Visto de Visita por meio eletrônico
                 
   
-  /user-details/communication/{userID}isValid=true:
+  /user-details/communication/{userID}:
     get:
       tags:
       - Perfil Comunicação
-      summary: Retorno dos dados Comunicação cadastrados do usuário 
+      summary: Endpoint para recupera dados de comunicação do usuário 
       parameters:
         - in: path
           name: userID
@@ -1234,12 +1230,10 @@ paths:
                     phoneTypeId: 1
                     authorize: true
                     countryCode: 55
-                
-  /user-details/communication/{userID}:
     patch:
       tags:
       - Perfil Comunicação
-      summary: Entrada de dados para atualizar comunicação
+      summary: Endpoint para atualizar dados da comunicação no perfil do usuário
       parameters:
         - in: path
           name: userID
@@ -1284,7 +1278,7 @@ paths:
     get:
       tags:
       - Perfil Comunicação
-      summary: Endpoint usado para recuperar estados de emissão do RG cadastrados no sistema
+      summary: Endpoint para recuperar opções de paises cadastrados no sistema
       operationId: EditarPais
       parameters:
       - in: header
@@ -1311,7 +1305,7 @@ paths:
     get:
       tags:
       - Perfil Comunicação
-      summary: Endpoint usado para recuperar estados cadastrados no sistema
+      summary: Endpoint para recuperar estados cadastrados no sistema
       operationId: EditarEstadoDocumentaçãoRG
       parameters:
       - in: header
@@ -1416,7 +1410,7 @@ paths:
     get:
       tags:
       - Perfil Comunicação
-      summary: Endpoint usado para recuperar cidades cadastrados no sistema
+      summary: Endpoint para recuperar cidades cadastrados no sistema
       operationId: EditarCidade
       parameters:
       - in: header
@@ -1501,11 +1495,11 @@ paths:
                   ibgeId: 12908
                   stateId: 1
   
-  /user-details/professional/{userID}isValid=true:
+  /user-details/professional/{userID}:
     get:
       tags:
         - Perfil Profissional
-      summary: Retorno dos dados profissionais do usuário
+      summary: Endpoint para recuperar dados profissionais do usuário
       parameters:
         - in: path
           name: userID
@@ -1546,12 +1540,10 @@ paths:
                 role: Desenvolvedor
                 function: Testes e Manutenção
                 allocationUnity: Centro
-  
-  /user-details/professional/{userID}:
     patch:
       tags:
       - Perfil Profissional
-      summary: Entrada de dados para atualizar informações profissionais
+      summary: Endpoint para atualizar informações profissionais
       parameters:
         - in: path
           name: userID
@@ -1591,9 +1583,7 @@ paths:
     get:
       tags:
         - Perfil Profissional
-      summary: >-
-        Recuperar as informações previdenciárias referentes aos tipos de
-        declaração de INSS cadastradas no sistema
+      summary: Endpoint para recuperar as informações previdenciárias referentes aos tipos de declaração de INSS cadastradas no sistema
       operationId: EditarDeclaracaoInss
       parameters:
         - in: header
@@ -1627,7 +1617,7 @@ paths:
     post:
       tags:
         - Perfil Profissional
-      summary: Endpoint usado para recuperar as unidades organizacionais cadastradas no sistema
+      summary: Endpoint para atualizar as unidades organizacionais cadastradas
       operationId: EditarUnidadeOrganizacional
       parameters:
         - in: query
@@ -1676,11 +1666,11 @@ paths:
                 acronym: MUN
                 path:
                   - 4
-  /user-details/financial/{userID}isValid=true:
+  /user-details/financial/{userID}:
     get:
       tags:
         - Perfil Informações Adicionais
-      summary: Retorno dos dados adicionais do usuário
+      summary: Endpoint para recuperar dados adicionais do usuário
       parameters:        
         - in: path
           name: userID
@@ -1720,12 +1710,10 @@ paths:
                 rneClassificationId: 1
                 rneIssueDate: '2021-05-12'
                 incomeDate: '2021-05-12'
-  
-  /user-details/financial/{userID}:
     patch:
       tags:
       - Perfil Informações Adicionais
-      summary: Entrada de dados para atualizar informações adicionais
+      summary: Endpoint para atualizar informações adicionais
       parameters:
         - in: path
           name: userID
@@ -1797,7 +1785,7 @@ paths:
     get:
       tags:
         - Perfil Informações Adicionais
-      summary: Recuperar os tipos de conta de banco cadastradas no sistema
+      summary: Endpoit para recuperar tipos de conta bancária cadastradas no sistema
       operationId: EditarTipoConta
       parameters:
       - in: header
@@ -1828,7 +1816,7 @@ paths:
     get:
       tags:
         - Perfil Informações Adicionais
-      summary: Recuperar o tipo de Registro Nacional Migratório
+      summary: Endpoiint para recuperar o tipo de Registro Nacional Migratório cadastrado no sistema
       operationId: EditarRneClassification
       parameters:
       - in: header
@@ -1857,7 +1845,7 @@ paths:
     get:
       tags:
         - Perfil Formação
-      summary: Recuperar os tipos de formações cadastradas
+      summary: Endpoint para recuperar os tipos de formações cadastradas
       operationId: EditarTipoDeFormacao
       parameters:
       - in: header
@@ -1901,7 +1889,7 @@ paths:
     get:
       tags:
         - Perfil Formação
-      summary: Recuperar as áreas de estudo cadastradas
+      summary: Endpoint para recuperar as áreas de estudo cadastradas
       operationId: EditarAreasDeEstudo
       parameters:
       - in: header
@@ -1925,7 +1913,7 @@ paths:
     get:
       tags:
         - Perfil Formação
-      summary: Recuperar as áreas de estudo cadastradas
+      summary: Endpoint para recuperar tipos de modalidades cadastradas
       operationId: EditarModalidadeDeEnsino
       parameters:
       - in: header
@@ -1956,7 +1944,7 @@ paths:
     get:
       tags:
         - Perfil Formação
-      summary: Recuperar as áreas de estudo cadastradas
+      summary: Endpoint para recuperar opções de idiomas cadastrados
       operationId: EditarIdioma
       parameters:
       - in: header
@@ -1980,7 +1968,7 @@ paths:
     get:
       tags:
         - Perfil Formação
-      summary: Recuperar as áreas de estudo cadastradas
+      summary: Endpoint para recuperar opções de proeficiência nos idiomas cadastrados
       operationId: EditarProeficiência
       parameters:
       - in: header
@@ -2023,7 +2011,7 @@ paths:
     post:  
       tags:
        - Estrutura Organizacionais
-      summary: Endpoint de retorno das estruturas organizacionais cadastradas
+      summary: Endpoint para adcionar estruturas organizacionais cadastradas
       parameters:
         - in: header
           name: Header
@@ -2040,20 +2028,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrganizationalStructures'
-              example:
-        400:
-          description: Erro apresentado quando um usuário ou aplicação estão desabilitados, ou usuário não tem permissões
-          content:
-            ApiErrorResponse:
-              schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
-              examples:
-                ArquivoNãoEnviado:
-                  value:
-                    message: Arquivo não enviado.
-                    status: 400
-                    details: null
-                    errorCode: null
+              
                 
           
               
@@ -2061,7 +2036,7 @@ paths:
     get:
       tags:
        - Estrutura Organizacionais
-      summary: Endpoint de retorno das estruturas organizacionais cadastradas
+      summary: Endpoint para recuperar estruturas organizacionais cadastradas
       parameters:
         - in: header
           name: Header
@@ -2188,7 +2163,7 @@ paths:
     get:
       tags:
         - Estrutura Organizacionais
-      summary: Endpoint onde retorna a organização cadastrada
+      summary: Endpoint recuperar uma organzação específica
       parameters:
         - in: path
           name: parentId
@@ -2256,7 +2231,7 @@ paths:
     get:
       tags:
         - Estrutura Organizacionais
-      summary: Endpoint onde retorna tipo de organização
+      summary: Endpoint para recuperar tipo de organização
       parameters:
         - in: header
           name: Header
@@ -2283,7 +2258,7 @@ paths:
     get:
       tags:
         - Estrutura Organizacionais
-      summary: Endpoint onde retorna a classificação da organização
+      summary: Endpoint para recuperar classificação da organização
       parameters:
         - in: header
           name: Header
@@ -2310,7 +2285,7 @@ paths:
     get:
       tags:
         - Estrutura Organizacionais
-      summary: Endpoint onde retorna a especialização da organização
+      summary: Endpoint para recuperar especialização da organização
       parameters:
         - in: header
           name: Header
@@ -2337,7 +2312,7 @@ paths:
     get:
       tags:
         - Aplicação
-      summary: Endpoint onde retorna as aplicações cadastradas
+      summary: Endpoint para recuperar aplicações cadastradas
       parameters:
         - in: header
           name: Header
@@ -2383,7 +2358,7 @@ paths:
     post:
       tags:
         - Aplicação
-      summary: Cadastro de uma nova Aplicação
+      summary: Endpoitn para adicionar uma nova Aplicação
       parameters:
         - in: header
           name: Header
@@ -2411,12 +2386,125 @@ paths:
                 enabled: true
                 hasSecret: false
                 allowedTokens: 1
-  
+  /applications{id}:
+    get:
+      tags:
+        - Aplicação
+      summary: Endpoint para recuperar aplicação específica
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Aplicações cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredApplications'
+              example:
+                id: 4
+                clientId: 42
+                title: APLICAÇÃO TESTE
+                description: Testee de cadastro para aplicações
+                appKey: 02545692bd900f771de7fee38380194a
+                acronym: APPTT
+                redirectUrl: 'http://localhost:3000/applications/teste'
+                enabled: true
+                hasSecret: true
+                allowedTokens: 1
+    put:
+      tags:
+        - Aplicação
+      summary: Endpoint para atualizar aplicação específica
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Aplicações atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredApplications'
+              example:      
+                id: 4
+                clientId: 42
+                title: APLICAÇÃO TESTE PARA
+                description: Teste de cadastro para aplicações
+                appKey: 02545692bd900f771de7fee38380194a
+                acronym: APPTTT
+                redirectUrl: 'http://localhost:3000/applications/teste'
+                enabled: false
+                hasSecret: true
+                allowedTokens: 1
+                
+            
+  /applications/{id}/enable:
+    patch:
+      tags:
+        - Aplicação
+      summary: Endpoint para adicioanr aplicação ativada/desativada
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Aplicações cadastradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisteredApplications'
+              example:
+                id: 4
+                clientId: 42
+                title: APLICAÇÃO TESTE
+                description: Testee de cadastro para aplicações
+                appKey: 02545692bd900f771de7fee38380194a
+                acronym: APPTT
+                redirectUrl: 'http://localhost:3000/applications/teste'
+                enabled: true
+                hasSecret: true
+                allowedTokens: 1
+      
+    
   /{appKey}/access-profiles:
     get:
       tags:
         - Aplicação
-      summary: Endpoint onde retorna os perfis cadastradas
+      summary: Endpoint para recuperar perfis cadastradas
       parameters:
         - in: header
           name: Header
@@ -2451,7 +2539,7 @@ paths:
     post:
       tags:
         - Aplicação
-      summary: Cadastro de perfil na aplicação
+      summary: Endpoint para adicionar perfil na aplicação
       parameters:
         - in: header
           name: Header
@@ -2488,7 +2576,7 @@ paths:
     patch:
       tags:
         - Aplicação
-      summary: Requisição de uma chave privada
+      summary: Endpoint para recuperar uma chave privada
       parameters:
         - in: header
           name: Header
@@ -2518,7 +2606,7 @@ paths:
     get:
       tags:
         - Aplicação
-      summary: Tipos de documentos cadastrados
+      summary: Endpoint para ecuperar tipos de documentos cadastrados
       parameters:
         - in: header
           name: Header
@@ -2540,7 +2628,7 @@ paths:
     get:
       tags:
         - Aplicação
-      summary: Retorno de documentos cadastrados
+      summary: Endpoint para recuperar documentos cadastrados
       parameters:
         - in: header
           name: Header
@@ -2564,11 +2652,72 @@ paths:
               schema:
                 $ref: '#/components/schemas/DocumentType'     
   
+  /application/assignments/roles:
+    get:
+      tags:
+        - Aplicação
+      summary: Endpoint para recuperar funções atribuidas ao usuário cadastradas
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Aplicação cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolesUser'
+              example:
+                - appServerKey: 80c93ebdf57d3836da3086d3d0a998ee
+                  rolesAssignment:
+                    - appId: 1
+                      roleId: 1
+                      clientId: 8
+                      createDate: '2021-04-29T19:13:30-03:00'
+                    - appId: 1
+                      roleId: 12
+                      clientId: 8
+                      createDate: '2021-04-29T19:13:30-03:00'
+                                
+  /client/{userId}/application/assignments/profiles:
+    get:
+      tags:
+        - Aplicação
+      summary: Endpoint para recuperar perfis que usuário possue na aplicação
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: userId
+          description: Id de identificação do usuário
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Aplicação cadastrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profiles'
+ 
   /users:
     get:
       tags:
       - Usuários
-      summary: Endpoint que retorna os usuários cadastrados no sistema
+      summary: Endpoint para recuperar os usuários cadastrados no sistema
       parameters:
         - in: header
           name: Header
@@ -2621,7 +2770,7 @@ paths:
     get:
       tags:
         - Usuários
-      summary: Endpoint que retorna as informações de usuário um específico
+      summary: Endpoint para recuperar informações de um usuário específico
       parameters:
         - in: header
           name: Header
@@ -2655,7 +2804,7 @@ paths:
     delete:
       tags:
         - Usuários
-      summary: Endpoint que deleta um usuário do sistema
+      summary: Endpoint para deletar um usuário do sistema
       parameters:
         - in: header
           name: Header
@@ -2683,8 +2832,8 @@ paths:
   /roles:
     post:
       tags:
-        - Permissões Gerais
-      summary: Endpoint para a criação de uma nova permissão
+      - Permissões Gerais
+      summary: Endpoint para adicionar uma nova permissão
       parameters:
         - in: header
           name: Header
@@ -2710,12 +2859,46 @@ paths:
                 type: basic
                 disabled: true
                 twoFactorRequired: false
-                
+    get:
+      tags:
+        - Permissões Gerais
+      summary: Endpoint para recuperar as permissões do sistema dado o Id de uma aplicação
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: query
+          name: appId
+          schema:
+            type: integer
+          description: Id de uma aplicação
+          required: true
+      responses:
+        200:
+          description: Permissões relacionadas com o Id da aplicação
+          content:
+            application/json:
+              example:
+                - id: 25
+                  appId: 4
+                  title: ROLE_APPTT_ADM
+                  description: PERMISSÃO PARA SER ADMINISTRADOR
+                  type: basic
+                  disabled: false
+                  twoFactorRequired: false
+              schema:
+                $ref: '#/components/schemas/RolesAppId'
+                  
   /roles/{id}:
     put:
       tags:
         - Permissões Gerais
-      summary: Endpoint para a edição de uma permissão
+      summary: Endpoint para editar permissão
       parameters:
         - in: header
           name: Header
@@ -2750,7 +2933,7 @@ paths:
     delete:
       tags:
         - Permissões Gerais
-      summary: Endpoint para a remoção de uma permissão
+      summary: Endpoint para remover uma permissão
       parameters:
         - in: header
           name: Header
@@ -2780,7 +2963,7 @@ paths:
     get:
       tags:
         - Permissões Gerais
-      summary: Endpoint que retorna todas as permissões do sistema
+      summary: Endpoint para recuperar as permissões do sistema
       parameters:
         - in: header
           name: Header
@@ -2811,8 +2994,314 @@ paths:
                   disabled: true
                   twoFactorRequired: false
   
+  /assignments-approvers/accessible-apps:
+    get:
+      tags:
+        - Vinculadores
+      summary: Endpoint que retorna aplicações cadastradas no sistema
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      responses:
+        200:
+          description: Vinculadores cadastrados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VinculadoresAplicacoes'
+              example:
+                - id: 1
+                  title: ACESSO CIDADÃO
+                  appKey: 80c93ebdf57d3836da3086d3d0a998ee
+                - id: 3
+                  title: INTEGRASOCIAL
+                  appKey: 4a9682ec97638ce118f558cae1c872cb
+                - id: 2
+                  title: PORTAL DE SERVIÇOS
+                  appKey: e70b335a916a6429f9964c5e29e69048
+                - id: 4
+                  title: APLICAÇÃO TESTE
+                  appKey: 02545692bd900f771de7fee38380194a
+                  
+  /assignments-approvers:
+    post:
+      tags:
+        - Vinculadores
+      summary: Endpoint para cadastrar um vinculador
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+      requestBody:
+        $ref: '#/components/requestBodies/VinculadorRequestBody'
+      responses:
+        201:
+          description: Dados do novo vinculador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vinculador'
+              example:
+                id: 1
+                userId: 07695430307
+                appId: 4
+                organizationId: 1
+                addedBy: 07695430307
+                lastUpdatedBy: 07695430307
+                creationDate: '2021-05-17T15:17:58-03:00'
+                lastUpdate: '2021-05-17T15:17:58-03:00'
+                roles: []
+                profiles:
+                  - 2
+                  
+  /assignments-approvers/search:
+    get:
+      tags:
+        - Vinculadores
+      summary: Endpoint que retorna os vinculadores de uma busca
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: query
+          name: application
+          description: Nome da aplicação
+          schema:
+            type: string
+        - in: query
+          name: name
+          description: Nome do usuário associado ao vinculador
+          schema:
+            type: string
+        - in: query
+          name: organization
+          description: Nome da unidade organizacional
+          schema:
+            type: string
+        - in: query
+          name: sinespId
+          description: CPF do usuário associado ao vinculador
+          schema:
+            type: string
+      responses:
+        200:
+          description: Vinculador associado aos dados da busca
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchVinculador'
+              example:
+                - id: 3
+                  approverUserId: 07695430307
+                  approverName: Carlos Ferreira
+                  appId: 4
+                  appName: APLICAÇÃO TESTE
+                  organizationId: 1
+                  organizationName: Cidadão Brasileiro
+                  addedBy: 07695430307
+                  lastUpdatedBy: 07695430307
+                  creationDate: '2021-05-17T15:30:20-03:00'
+                  lastUpdate: '2021-05-17T15:57:43-03:00'
+                  
+                  
+  /assignments-approvers/{userId}/{appId}:
+    get:
+      tags:
+        - Vinculadores
+      summary: Endpoint que retorna os dados de um vinculador dado o Id do usuário e o Id da aplicação associados
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: userId
+          description: Id do usuário associado
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: appId
+          description: Id da aplicação associada
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Dados do vinculador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VinculadorEspecifico'
+              example:
+                id: 3
+                approverUserId: 07695430307
+                approverName: Carlos Ferreira
+                appId: 4
+                appName: APLICAÇÃO TESTE
+                organizationId: 1
+                organizationName: Cidadão Brasileiro
+                addedBy: 07695430307
+                lastUpdatedBy: 07695430307
+                creationDate: '2021-05-17T15:30:20-03:00'
+                lastUpdate: '2021-05-17T15:57:43-03:00'
+                permissions:
+                  roles: []
+                  profiles:
+                    - 2
+    patch:
+      tags:
+        - Vinculadores
+      summary: Endpoint para editar os dados de um vinculador
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: userId
+          description: Id do usuário associado
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: appId
+          description: Id da aplicação associada
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        $ref: '#/components/requestBodies/VinculadorRequestBody'
+      responses:
+        200:
+          description: Dados editados do vinculador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vinculador'
+              example:
+                id: 3
+                userId: 07695430307
+                appId: 4
+                organizationId: 1
+                addedBy: 07695430307
+                lastUpdatedBy: 07695430307
+                creationDate: '2021-05-17T15:30:20-03:00'
+                lastUpdate: '2021-05-17T17:44:59-03:00'
+                roles:
+                  - 25
+                profiles:
+                  - 2
+    delete:
+      tags:
+        - Vinculadores
+      summary: Endpoint para deletar um vinculador
+      parameters:
+        - in: header
+          name: Header
+          description: Token access enviado no header da requisição
+          schema:
+            $ref: '#/components/schemas/Me'
+          example:
+            Authorization: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTg5NDIzODAsImlkZW50aWZpZXIiOiIwNTc1MDAxOTMzMCIsInRva2VuVHlwZSI6ImdyYW50IiwidG9rZW5OdW1iZXIiOjEsImNsaWVudFR5cGUiOiJ1c2VyIn0.4Pb9_z7B-00AOGtcbFtHFFOaukX_YQ4Chrc1C6jeW7o"
+            Accept-Client: "80c93ebdf57d3836da3086d3d0a998ee"
+        - in: path
+          name: userId
+          description: Id do usuário associado
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: appId
+          description: Id da aplicação associada
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Retorno dos dados do vinculador deletado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VinculadorEspecifico'
+              example:
+                id: 3
+                approverSinespId: 07695430307
+                approverName: Carlos Ferreira
+                appId: 4
+                appName: APLICAÇÃO TESTE
+                organizationId: 1
+                organizationName: Cidadão Brasileiro
+                addedBy: 07695430307
+                lastUpdatedBy: 07695430307
+                creationDate: '2021-05-17T15:30:20-03:00'
+                lastUpdate: '2021-05-17T18:03:30-03:00'
+                permissions:
+                  roles:
+                    - 25
+                  profiles:
+                    - 2
+  
 components:
   requestBodies:
+    VinculadorRequestBody:
+      description: Request Body da criação ou edição de um vinculador
+      required: true
+      content:
+        application/json:
+          example:
+            userId: 07695430307
+            appId: 4
+            organizationId: 1
+            roles: []
+            profiles:
+              - 2
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+                description: CPF do criador do vinculador
+              appId:
+                type: integer
+                description: Id da aplicação
+              organizationId:
+                type: integer
+                description: Id da unidade organizacional
+              roles:
+                type: array
+                items:
+                  type: integer
+                  description: Lista de Id's das permissões associadas
+              profiles:
+                type: array
+                items:
+                  type: integer
+                  description: Lista de Id's dos perfis associados
     NewRoleRequestBody:
       description: Request Body da criação de nova permissão
       required: true
@@ -3987,6 +4476,222 @@ components:
     DeletarPermissao:
       type: boolean
       description: Retorno se a permissão foi deletada com sucesso
+    RolesUser:
+      type: array
+      items:
+        type: object
+        properties:
+          appServerKey:
+            type: string
+            description: Chave de acesso do cliente
+          rolesAssignment:
+            type: array
+            items:
+              type: object
+              properties:
+                appId:
+                  type: integer
+                  format: num32
+                  description: Identificador da aplicação
+                roleId:
+                  type: integer
+                  format: num32
+                  description: Identificador da função atribuída
+                clientId:
+                  type: integer
+                  format: num32
+                  description: Identificador do usuário
+                createDate:
+                  type: string
+                  description: Data de atribuição
+    Profiles:
+      type: array
+      items:
+        type: object
+        properties:
+          appId:
+            type: integer
+            format: num32
+            description: Identificador da aplicação
+          clientId:
+            type: integer
+            format: num32
+            description: Identificador do usuário
+          profiledId:
+            type: integer
+            format: num32
+            description: Identificador do perfil
+          createDate:
+            type: string
+            description: Data de criação
+          expirationDateTime:
+            type: string
+            description: Data de expiração
+    RolesAppId:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Id da permissão
+          appId:
+            type: integer
+            description: Id da aplicação
+          title:
+            type: string
+            description: Título da permissão
+          description:
+            type: string
+            description: Descrição da permissão
+          type:
+            type: string
+            description: Tipo da permissão
+          disabled:
+            type: boolean
+            description: Define se a permissão está ativa
+          twoFactorRequired:
+            type: boolean
+            description: Determina se a permissão possui obrigatoriedade de autenticação em duas etapas
+    SearchVinculador:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Id do vinculador
+          approverUserId:
+            type: string
+            description: CPF do usuário que aprovou o vinculador
+          approverName:
+            type: string
+            description: Nome do usuário que aprovou o vinculador
+          appId:
+            type: integer
+            description: Id da aplicação associada ao vinculador
+          appName:
+            type: string
+            description: Nome da aplicação associada ao vinculador
+          organizationId:
+            type: integer
+            description: Id da unidade organizacional
+          organizationName:
+            type: string
+            description: Nome da unidade organizacional
+          addedBy:
+            type: string
+            description: CPF do usuário que criou o vinculador
+          lastUpdatedBy:
+            type: string
+            description: CPF do usuário que fez a última edição
+          creationDate:
+            type: string
+            description: Data de criação do vinculador
+          lastUpdate:
+            type: string
+            description: Data da última modificação
+    Vinculador:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id do vinculador
+        userId:
+          type: string
+          description: CPF do usuário associado ao vinculador
+        appId:
+          type: integer
+          description: Id da aplicação associada ao vinculador
+        organizationId:
+          type: integer
+          description: Id da unidade organizacional
+        addedBy:
+          type: string
+          description: CPF do usuário que criou o vinculador
+        lastUpdatedBy:
+          type: string
+          description: CPF do usuário que fez a última edição
+        creationDate:
+          type: string
+          description: Data de criação
+        lastUpdate:
+          type: string
+          description: Data da última edição
+        roles:
+          type: array
+          items:
+            type: integer
+            description: Lista de Id's das permissões associadas
+        profiles:
+          type: array
+          items:
+            type: integer
+            description: Lista de Id's dos perfis associados
+    VinculadoresAplicacoes:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Id do vinculador
+          title:
+            type: string
+            description: Título do vinculador
+          appKey:
+            type: string
+            description: Chave da aplicação
+    VinculadorEspecifico:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id do vinculador
+        approverUserId:
+          type: string
+          description: CPF do usuário que aprovou o vinculador
+        approverName:
+          type: string
+          description: Nome do usuário que aprovou o vinculador
+        appId:
+          type: integer
+          description: Id da aplicação associada ao vinculador
+        appName:
+          type: string
+          description: Nome da aplicação associada ao vinculador
+        organizationId:
+          type: integer
+          description: Id da unidade organizacional
+        organizationName:
+          type: string
+          description: Nome da unidade organizacional
+        addedBy:
+          type: string
+          description: CPF do usuário que criou o vinculador
+        lastUpdatedBy:
+          type: string
+          description: CPF do usuário que fez a última edição
+        creationDate:
+          type: string
+          description: Data de criação do vinculador
+        lastUpdate:
+          type: string
+          description: Data da última modificação
+        permissions:
+          type: object
+          description: Listas de permissões e perfis do vinculador
+          properties:
+            roles:
+              type: array
+              items:
+                type: integer
+                description: Lista de Id's das permissões associadas
+            profiles:
+              type: array
+              items:
+                type: integer
+                description: Lista de Id's dos perfis associados
     2faValidate:
       type: object
     UserCredentials:
